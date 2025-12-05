@@ -936,8 +936,28 @@
   border-radius: 0 0 8px 8px;
   max-height: 300px;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 10;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(102, 126, 234, 0.2) transparent;
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+}
+
+.settings-social-platform-options::-webkit-scrollbar {
+  width: 1px;
+}
+
+.settings-social-platform-options::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.settings-social-platform-options::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 1px;
+}
+
+.settings-social-platform-options::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.5);
 }
 
 .settings-social-platform-option {
@@ -953,6 +973,7 @@
   transition: all 0.2s ease;
   text-align: left;
   border-left: 3px solid transparent;
+  font-size: 0.8rem;
 }
 
 .settings-social-platform-option:hover {

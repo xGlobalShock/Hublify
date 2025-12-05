@@ -30,7 +30,7 @@
   height: 40px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--interface-color, #ff9500) 0%, rgba(255, 107, 0, 0.8) 100%);
+  background-color: var(--interface-color);
   color: white;
   font-size: 1.5rem;
   cursor: pointer;
@@ -38,14 +38,13 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   pointer-events: auto;
   z-index: 1;
 }
 
 .streamers-preview-collapsed-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(var(--interface-color-rgb, 255, 149, 0), 0.4);
+  box-shadow: 0 0 10px var(--interface-color) !important;
 }
 
 .streamers-preview-collapsed-btn:active {

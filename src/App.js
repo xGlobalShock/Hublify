@@ -134,7 +134,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isProcessingAuth, setIsProcessingAuth] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [background, setBackground] = useState('floatinglines');
+  const [background, setBackground] = useState('lightrays-blue');
   const [isEditMode, setIsEditMode] = useState(false);
   const [showBgModal, setShowBgModal] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
@@ -481,11 +481,37 @@ function App() {
       nameColor: '#ffffff',
       fontFamily: 'default',
       nameAnimation: 'none',
-      links: {}
+      links: {},
+      streamSchedule: []
     };
 
-    // For Discord users, use passed profile if available
-    if (!authData.isGuest && authData.profile) {
+    // Try to load existing profile from localStorage
+    const userProfileKey = `socialProfile_${authData.user.id}`;
+    const savedProfile = localStorage.getItem(userProfileKey);
+    if (savedProfile) {
+      try {
+        const profile = JSON.parse(savedProfile);
+        profileData = {
+          background: profile.background || 'floatinglines',
+          name: profile.name || 'Your Name',
+          bio: profile.bio || '',
+          gender: profile.gender || 'Not specified',
+          country: profile.country || 'Not specified',
+          picture: profile.picture || '👤',
+          interfaceColor: profile.interfaceColor || '#667eea',
+          nameColor: profile.nameColor || '#ffffff',
+          fontFamily: profile.fontFamily || 'default',
+          nameAnimation: profile.nameAnimation || 'none',
+          links: profile.links || {},
+          streamSchedule: profile.streamSchedule || []
+        };
+      } catch (e) {
+        console.error('Failed to parse saved profile:', e);
+      }
+    }
+
+    // For Discord users, use passed profile if available (but don't override saved data)
+    if (!authData.isGuest && authData.profile && !savedProfile) {
       profileData = {
         background: authData.profile.background || 'floatinglines',
         name: authData.profile.name || 'Your Name',
@@ -497,18 +523,19 @@ function App() {
         nameColor: authData.profile.nameColor || '#ffffff',
         fontFamily: authData.profile.fontFamily || 'default',
         nameAnimation: authData.profile.nameAnimation || 'none',
-        links: authData.profile.links || {}
+        links: authData.profile.links || {},
+        streamSchedule: authData.profile.streamSchedule || []
       };
+    }
       
-      // Load picture from localStorage if available
-      const storedImage = localStorage.getItem(`profilePicture_${authData.user.id}`);
-      if (storedImage) {
-        profileData.picture = storedImage;
-      } else if (profileData.picture === 'STORED_IN_SESSION') {
-        // Fallback for old sessionStorage entries
-        const sessionImage = sessionStorage.getItem(`profilePicture_${authData.user.id}`);
-        profileData.picture = sessionImage || '👤';
-      }
+    // Load picture from localStorage if available
+    const storedImage = localStorage.getItem(`profilePicture_${authData.user.id}`);
+    if (storedImage) {
+      profileData.picture = storedImage;
+    } else if (profileData.picture === 'STORED_IN_SESSION') {
+      // Fallback for old sessionStorage entries
+      const sessionImage = sessionStorage.getItem(`profilePicture_${authData.user.id}`);
+      profileData.picture = sessionImage || '👤';
     }
 
     // Set all state together
@@ -526,6 +553,7 @@ function App() {
     setFontFamily(profileData.fontFamily);
     setNameAnimation(profileData.nameAnimation);
     setSocialLinks(profileData.links);
+    setStreamSchedule(profileData.streamSchedule);
     
     // Clear URL params
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -588,7 +616,10 @@ function App() {
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
-    return <Login onLoginSuccess={handleAuthSuccess} />;
+    return <Login 
+      onLoginSuccess={handleAuthSuccess} 
+      BACKGROUNDS={BACKGROUNDS}
+    />;
   }
 
   return (

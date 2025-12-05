@@ -25,7 +25,7 @@
   width: 40px !important;
   height: 40px !important;
   padding: 0 !important;
-  background: linear-gradient(135deg, var(--interface-color) 0%, rgba(102, 126, 234, 0.8) 100%) !important;
+  background-color: var(--interface-color);
   border: none !important;
   border-radius: 9px !important;
   color: #ffffff !important;
@@ -36,12 +36,11 @@
   cursor: pointer !important;
   transition: all 0.25s ease !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35) !important;
 }
 
 .schedule-preview-container.collapsed .schedule-toggle-btn:hover {
   transform: translateY(-3px) !important;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
+  box-shadow: 0 0 10px var(--interface-color) !important;
 }
 
 /* ===== EXPANDED STATE ===== */

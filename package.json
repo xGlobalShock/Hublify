@@ -1,0 +1,62 @@
+{
+	"name": "prism-background",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@fortawesome/fontawesome-svg-core": "^7.1.0",
+		"@fortawesome/free-brands-svg-icons": "^7.1.0",
+		"@fortawesome/react-fontawesome": "^3.1.1",
+		"bcryptjs": "^3.0.3",
+		"concurrently": "^8.2.2",
+		"cors": "^2.8.5",
+		"dotenv": "^17.2.3",
+		"express": "^5.2.1",
+		"jsonwebtoken": "^9.0.2",
+		"mongodb": "^7.0.0",
+		"mongoose": "^9.0.0",
+		"node-fetch": "^3.3.2",
+		"ogl": "^1.0.11",
+		"postprocessing": "^6.38.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.2.0",
+		"react-icons": "^5.5.0",
+		"react-scripts": "5.0.1",
+		"three": "^0.167.1"
+	},
+	"scripts": {
+		"start": "node scripts/start-quiet.js",
+		"start:backend": "node scripts/server-quiet.js",
+		"dev": "node scripts/dev-quiet.js",
+		"build": "react-app-rewired build",
+		"test": "react-app-rewired test",
+		"eject": "react-scripts eject"
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app"
+		]
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"autoprefixer": "^10.4.22",
+		"class-variance-authority": "^0.7.1",
+		"clsx": "^2.1.1",
+		"jsrepo": "^3.0.5",
+		"postcss": "^8.5.6",
+		"react-app-rewired": "^2.2.1",
+		"tailwind-merge": "^3.4.0",
+		"tailwindcss": "^3.4.18",
+		"tailwindcss-animate": "^1.0.7"
+	}
+}

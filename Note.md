@@ -1,0 +1,3 @@
+- Fix ( Select background loading time )
+- Fix ( Login Screen Background selection )
+- Fix ( Local Cache - Failing to load stream schedule on login )

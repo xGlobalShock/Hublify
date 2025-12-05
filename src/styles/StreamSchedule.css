@@ -1,0 +1,367 @@
+.stream-schedule-container {
+  width: 100%;
+  padding: 1.5rem;
+  background: rgba(20, 20, 40, 0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.schedule-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.add-stream-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(102, 126, 234, 0.15) 100%);
+  border: 1.5px solid rgba(102, 126, 234, 0.5);
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.add-stream-btn:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(102, 126, 234, 0.3) 100%);
+  border-color: rgba(102, 126, 234, 0.8);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.schedule-empty {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.schedule-empty p {
+  margin: 0.5rem 0;
+}
+
+.schedule-table {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.schedule-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(50, 50, 80, 0.4);
+  border-radius: 8px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  transition: all 0.3s ease;
+  gap: 1.5rem;
+}
+
+.schedule-card:hover {
+  background: rgba(50, 50, 80, 0.7);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+.card-content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.2fr 1fr;
+  gap: 1.5rem;
+  flex: 1;
+  align-items: center;
+}
+
+.card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.card-section .label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-section .value {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-scheduled {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.status-nostream {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.card-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1.5px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.card-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.card-edit-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1.5px solid rgba(255, 193, 7, 0.5);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 193, 7, 0.8);
+}
+
+.card-edit-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.card-edit-btn:hover {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.8);
+  color: #ffffff;
+}
+
+.edit-btn {
+  padding: 0.25rem 0.45rem;
+  font-size: 0.6rem;
+  border-color: rgba(255, 193, 7, 0.5) !important;
+  color: rgba(255, 193, 7, 0.8) !important;
+}
+
+.edit-btn:hover {
+  background: rgba(255, 193, 7, 0.2) !important;
+  border-color: rgba(255, 193, 7, 0.8) !important;
+  color: #ffffff !important;
+}
+
+.delete-btn {
+  border-color: rgba(244, 67, 54, 0.5);
+  color: rgba(244, 67, 54, 0.8);
+}
+
+.delete-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  border-color: rgba(244, 67, 54, 0.8);
+  color: #ffffff;
+}
+
+/* Modal Styles */
+.schedule-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+}
+
+.schedule-modal {
+  background: linear-gradient(135deg, rgba(20, 20, 40, 0.95) 0%, rgba(30, 30, 60, 0.95) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(102, 126, 234, 0.3);
+}
+
+.schedule-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.schedule-modal-header h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+
+.schedule-modal-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.schedule-modal-close:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.schedule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.schedule-input {
+  padding: 0.8rem 1rem;
+  background: rgba(50, 50, 80, 0.5);
+  border: 1.5px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.schedule-input:focus {
+  outline: none;
+  background: rgba(50, 50, 80, 0.8);
+  border-color: rgba(102, 126, 234, 0.6);
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+}
+
+.schedule-input option {
+  background: #1a1a2e;
+  color: #ffffff;
+}
+
+.schedule-modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.schedule-btn-cancel,
+.schedule-btn-save {
+  flex: 1;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.schedule-btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.schedule-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.schedule-btn-save {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(102, 126, 234, 0.3) 100%);
+  color: #ffffff;
+  border: 1.5px solid rgba(102, 126, 234, 0.6);
+}
+
+.schedule-btn-save:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(102, 126, 234, 0.5) 100%);
+  border-color: rgba(102, 126, 234, 0.8);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+}
+
+@media (max-width: 768px) {
+  .schedule-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .card-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .card-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .card-btn {
+    width: 36px;
+    height: 36px;
+  }
+}

@@ -16,6 +16,7 @@ import LiquidChrome from './effects/LiquidChrome';
 import Login from './pages/Login';
 import OAuthCallback from './pages/OAuthCallback';
 import StaggeredBackgroundPreview from './lib/StaggeredBackgroundPreview';
+import BackgroundCategoryModal from './lib/BackgroundCategoryModal';
 import Settings from './pages/Settings';
 import SchedulePreview from './lib/SchedulePreview';
 import StreamersPreview from './pages/StreamersDisplay';
@@ -814,49 +815,35 @@ function App() {
 
       {/* Background Selector Modal */}
       {showBgModal && (
-        <div className="background-selector-modal" onClick={() => setShowBgModal(false)}>
-          <div className="background-selector-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-modal-btn" onClick={() => setShowBgModal(false)}>
-              ✕
-            </button>
-            <h3>Select Background</h3>
-            <div className="bg-buttons">
-              {BACKGROUNDS.map((bg, index) => (
-                <StaggeredBackgroundPreview
-                  key={bg.id}
-                  bg={bg}
-                  index={index}
-                  isActive={background === bg.id}
-                  onClick={() => {
-                    const newBg = bg.id;
-                    setBackground(newBg);
-                    // Save background immediately - but handle quota errors
-                    try {
-                      // Try to load existing user profile
-                      const userProfileKey = `socialProfile_${currentUser?.id}`;
-                      const existingProfile = localStorage.getItem(userProfileKey);
-                      if (existingProfile) {
-                        const profile = JSON.parse(existingProfile);
-                        profile.background = newBg;
-                        localStorage.setItem(userProfileKey, JSON.stringify(profile));
-                      } else {
-                        // If no user profile exists, save just the background
-                        const minimalProfile = {
-                          background: newBg
-                        };
-                        localStorage.setItem(userProfileKey, JSON.stringify(minimalProfile));
-                      }
-                    } catch (e) {
-                      console.warn('Failed to save background:', e);
-                      // Silently fail - background is already updated in UI state
-                    }
-                    setShowBgModal(false);
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+        <BackgroundCategoryModal
+          backgrounds={BACKGROUNDS}
+          onSelect={(bgId) => {
+            const newBg = bgId;
+            setBackground(newBg);
+            // Save background immediately - but handle quota errors
+            try {
+              // Try to load existing user profile
+              const userProfileKey = `socialProfile_${currentUser?.id}`;
+              const existingProfile = localStorage.getItem(userProfileKey);
+              if (existingProfile) {
+                const profile = JSON.parse(existingProfile);
+                profile.background = newBg;
+                localStorage.setItem(userProfileKey, JSON.stringify(profile));
+              } else {
+                // If no user profile exists, save just the background
+                const minimalProfile = {
+                  background: newBg
+                };
+                localStorage.setItem(userProfileKey, JSON.stringify(minimalProfile));
+              }
+            } catch (e) {
+              console.warn('Failed to save background:', e);
+              // Silently fail - background is already updated in UI state
+            }
+            setShowBgModal(false);
+          }}
+          onClose={() => setShowBgModal(false)}
+        />
       )}
 
       {/* Color Selector Modal */}

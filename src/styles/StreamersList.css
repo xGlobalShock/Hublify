@@ -127,7 +127,7 @@
 }
 
 .streamers-list-add-btn {
-  background: linear-gradient(135deg, var(--interface-color, #ff9500) 0%, rgba(255, 107, 0, 0.8) 100%);
+  background-color: var(--interface-color);
   border: none;
   border-radius: 6px;
   color: white;
@@ -144,7 +144,7 @@
 
 .streamers-list-add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--interface-color-rgb, 255, 149, 0), 0.4);
+  box-shadow: 0 0 10px rgba(var(--interface-color-rgb, 255, 149, 0), 0.5);
 }
 
 .streamers-list-add-btn:active {
@@ -244,7 +244,7 @@
 }
 
 .streamers-list-done-btn {
-  background: linear-gradient(135deg, var(--interface-color, #ff9500) 0%, rgba(255, 107, 0, 0.8) 100%);
+  background-color: var(--interface-color);
   border: none;
   border-radius: 6px;
   color: white;
@@ -257,7 +257,7 @@
 
 .streamers-list-done-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--interface-color-rgb, 255, 149, 0), 0.4);
+  box-shadow: 0 0 10px rgba(var(--interface-color-rgb, 255, 149, 0), 0.5);
 }
 
 .streamers-list-done-btn:active {

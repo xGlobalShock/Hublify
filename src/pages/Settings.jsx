@@ -85,12 +85,12 @@ const Settings = ({
 
     if (showCountryDropdown || showGenderDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
+      
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showCountryDropdown, showGenderDropdown, setShowCountryDropdown, setCountrySearch]);
+  }, [showCountryDropdown, showGenderDropdown]);
 
   const SIDEBAR_ITEMS = [
     { id: 'profile', label: 'Profile Info', Icon: FaUser },

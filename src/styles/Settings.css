@@ -1311,7 +1311,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
-  background: linear-gradient(135deg, var(--interface-color, #ff9500) 0%, rgba(255, 107, 0, 0.8) 100%);
+  background-color: var(--interface-color);
   border: none;
   border-radius: 8px;
   padding: 0.8rem 1.5rem;
@@ -1324,7 +1324,7 @@
 
 .settings-open-streamers-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(var(--interface-color-rgb, 255, 149, 0), 0.4);
+  box-shadow: 0 0 10px rgba(var(--interface-color-rgb, 255, 149, 0), 0.4);
 }
 
 .settings-description {

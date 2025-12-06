@@ -20,16 +20,11 @@ let browserOpened = false;
 console.log = (...args) => {
   const message = args.join(' ');
   
-  // Allow localhost URLs to print so browser can open
-  if (message.includes('http://localhost')) {
-    browserOpened = true;
-    return originalLog.apply(console, args);
-  }
-  
   // Filter out unwanted react-scripts messages
-  if (message.includes('webpack compiled')) return;
-  if (message.includes('You can now view')) return;
-  if (message.includes('Local:')) return;
+    if (message.includes('webpack compiled')) return;
+    if (message.includes('You can now view')) return;
+    if (message.includes('Local:')) return;
+    if (message.includes('http://localhost')) return;
   if (message.includes('On Your Network:')) return;
   if (message.includes('Note that the development build')) return;
   if (message.includes('To create a production build')) return;
@@ -37,6 +32,7 @@ console.log = (...args) => {
   if (message.includes('Compiled successfully')) return;
   if (message.includes('[eslint]')) return;
   if (message.includes('Search for the keywords')) return;
+  if (message.match(/Search for the keywords to learn more about each warning\./)) return;
   if (message.includes('To ignore, add')) return;
   if (message.match(/Line \d+:\d+:/)) return;
   if (message.includes('no-unused-vars')) return;

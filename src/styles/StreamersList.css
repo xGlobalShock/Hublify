@@ -29,8 +29,8 @@
   border: 1px solid rgba(var(--interface-color-rgb, 255, 149, 0), 0.3);
   border-radius: 12px;
   width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
+  max-width: 650px;
+  max-height: 70vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -167,20 +167,24 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.6rem;
 }
 
 .streamers-list-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 0.6rem;
   background: rgba(var(--interface-color-rgb, 255, 149, 0), 0.05);
   border: 1px solid rgba(var(--interface-color-rgb, 255, 149, 0), 0.2);
-  border-radius: 6px;
+  border-radius: 8px;
   transition: all 0.2s ease;
+  text-align: center;
+  position: relative;
 }
 
 .streamers-list-item:hover {
@@ -191,27 +195,34 @@
 .streamer-name {
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 .streamer-remove-btn {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
   color: #ef4444;
-  width: 28px;
-  height: 28px;
-  border-radius: 5px;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   transition: all 0.2s ease;
+  opacity: 0.7;
 }
 
 .streamer-remove-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.6);
+  opacity: 1;
 }
 
 .streamers-list-empty {

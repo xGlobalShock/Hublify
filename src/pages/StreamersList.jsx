@@ -82,14 +82,14 @@ const StreamersList = ({ streamersList, setStreamersList, onClose, currentUser }
               <ul>
                 {streamersList.map((username) => (
                   <li key={username} className="streamers-list-item">
-                    <span className="streamer-name">{username}</span>
                     <button
                       className="streamer-remove-btn"
                       onClick={() => handleRemoveStreamer(username)}
                       title="Remove Streamer"
                     >
-                      <FaTrash />
+                      <FaXmark />
                     </button>
+                    <span className="streamer-name">{username}</span>
                   </li>
                 ))}
               </ul>

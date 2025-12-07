@@ -214,7 +214,7 @@ function App() {
     { name: 'Teal', hex: '#14b8a6' },
     { name: 'Indigo', hex: '#6366f1' },
     { name: 'Violet', hex: '#8b5cf6' },
-    { name: 'Rose', hex: '#f43f5e' }
+    { name: 'Lime', hex: '#84cc16' }
   ];
 
   // Load profile data from localStorage
@@ -905,7 +905,7 @@ function App() {
       {/* Color Selector Modal */}
       {showColorModal && (
         <div className="background-selector-modal" onClick={() => setShowColorModal(false)}>
-          <div className="color-selector-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="interface-color-modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-modal-btn" onClick={() => {
               // Apply temp interface color if changed
               if (tempInterfaceColor !== null) {
@@ -950,7 +950,7 @@ function App() {
               />
               <span className="modal-color-value">{tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor}</span>
             </div>
-            <div className="modal-color-grid">
+            <div className="interface-color-grid">
               {COLOR_PRESETS.map(color => (
                 <button
                   key={color.hex}

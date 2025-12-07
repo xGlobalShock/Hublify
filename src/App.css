@@ -1568,6 +1568,23 @@ body {
   animation: slideUpScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.interface-color-modal-content {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.95) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 24px;
+  padding: 1rem;
+  max-width: 600px;
+  width: 25%;
+  max-height: 95vh;
+  overflow-y: auto;
+  box-shadow: 
+    0 0 60px rgba(59, 130, 246, 0.15),
+    0 20px 80px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: slideUpScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @keyframes slideUpScale {
   from {
     opacity: 0;
@@ -1580,7 +1597,8 @@ body {
 }
 
 .background-selector-modal-content h3,
-.color-selector-modal-content h3 {
+.color-selector-modal-content h3,
+.interface-color-modal-content h3 {
   margin: 0 0 2.5rem 0;
   font-size: 1.2rem;
   font-weight: 700;
@@ -1599,7 +1617,8 @@ body {
 }
 
 .background-selector-modal-content h3::after,
-.color-selector-modal-content h3::after {
+.color-selector-modal-content h3::after,
+.interface-color-modal-content h3::after {
   content: '';
   position: absolute;
   bottom: -10px;
@@ -2096,6 +2115,12 @@ body {
 .modal-color-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
+  gap: 0.6rem;
+}
+
+.interface-color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.6rem;
 }
 

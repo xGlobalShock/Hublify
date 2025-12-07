@@ -34,7 +34,7 @@
 }
 
 .bg-modal-compact {
-  max-width: 700px;
+  max-width: 600px;
 }
 
 .bg-modal-categories {
@@ -76,23 +76,24 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
+  justify-items: center;
 }
 
 .bg-modal-category-btn {
   position: relative;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 2rem;
   background: rgba(15, 23, 42, 0.6);
-  border: 2px solid rgba(59, 130, 246, 0.3);
-  border-radius: 16px;
+  border-radius: 12px;
   color: #ffffff;
   font-size: 0.9rem;
+    border: 2px solid rgba(59, 130, 246, 0.3);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  text-transform: uppercase;
   letter-spacing: 1.5px;
-  max-width: 280px;
+  min-width: 140px;
+  text-align: center;
 }
 
 .bg-modal-category-btn::before {
@@ -112,7 +113,7 @@
   inset: 0;
   padding: 2px;
   background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-  border-radius: 16px;
+  border-radius: 12px;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

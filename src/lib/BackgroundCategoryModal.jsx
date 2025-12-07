@@ -3,7 +3,7 @@ import './BackgroundCategoryModal.css';
 
 // Simple render limiting to prevent too many simultaneous renders
 let renderCount = 0;
-const MAX_SIMULTANEOUS_RENDERS = 6; // Allow more but stagger them
+const MAX_SIMULTANEOUS_RENDERS = 2; // Very conservative limit to prevent WebGL context exhaustion
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -33,8 +33,8 @@ class ErrorBoundary extends React.Component {
 }
 
 const CATEGORIES = [
-  { id: 'space', label: 'Space Backgrounds' },
-  { id: 'orb', label: 'Orb Backgrounds' }
+  { id: 'space', label: 'Space' },
+  { id: 'orb', label: 'Orb' }
 ];
 
 // Isolated wrapper that renders background once and never updates
@@ -131,8 +131,9 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   }, []);
 
   useEffect(() => {
-    // Simple staggered rendering - just delay each one slightly
-    const delay = Math.random() * 200; // Random delay up to 200ms
+    // Very conservative staggered rendering to prevent context exhaustion
+    // Each preview gets a longer delay to space out context creation
+    const delay = Math.random() * 1000 + 200; // Random delay 200-1200ms
     
     const timer = setTimeout(() => {
       setShouldRender(true);

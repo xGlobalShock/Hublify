@@ -10,6 +10,8 @@ export const LiquidChrome = ({
   frequencyX = 3,
   frequencyY = 3,
   interactive = true,
+  followMouse,
+  mouseInfluence,
   ...props
 }) => {
   const containerRef = useRef(null);
@@ -148,10 +150,20 @@ export const LiquidChrome = ({
         container.removeEventListener('mousemove', handleMouseMove);
         container.removeEventListener('touchmove', handleTouchMove);
       }
-      if (gl.canvas.parentElement) {
-        gl.canvas.parentElement.removeChild(gl.canvas);
+      try {
+        if (gl.canvas && gl.canvas.parentElement) {
+          gl.canvas.parentElement.removeChild(gl.canvas);
+        }
+        const loseCtx = gl.getExtension('WEBGL_lose_context');
+        if (loseCtx) {
+          loseCtx.loseContext();
+        }
+        if (renderer && renderer.gl) {
+          renderer.gl = null;
+        }
+      } catch (e) {
+        // Context already lost
       }
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
   }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 

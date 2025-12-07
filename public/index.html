@@ -6,6 +6,39 @@
     <meta name="theme-color" content="#667eea" />
     <meta name="description" content="Hublify - Create your stunning profile with custom backgrounds and social links" />
     <title>Hublify - Create Your Stunning Profile</title>
+    <script>
+      // Suppress console messages before React loads
+      (function() {
+        const originalLog = console.log;
+        const originalInfo = console.info;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+          if (args[0] && typeof args[0] === 'string' && 
+              (args[0].includes('React DevTools') || args[0].includes('react-devtools'))) {
+            return;
+          }
+          originalLog.apply(console, args);
+        };
+        
+        console.info = function(...args) {
+          if (args[0] && typeof args[0] === 'string' && 
+              (args[0].includes('React DevTools') || args[0].includes('react-devtools'))) {
+            return;
+          }
+          originalInfo.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+          if (args[0] && typeof args[0] === 'string' && 
+              (args[0].includes('React DevTools') || args[0].includes('react-devtools') || 
+               args[0].includes('WebGL context'))) {
+            return;
+          }
+          originalWarn.apply(console, args);
+        };
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

@@ -46,7 +46,7 @@ void main() {
 }
 `;
 
-export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude = 0.1, mouseReact = true, ...rest }) {
+export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude = 0.1, mouseReact = true, followMouse, mouseInfluence, interactive, ...rest }) {
   const ctnDom = useRef(null);
   const mousePos = useRef({ x: 0.5, y: 0.5 });
 
@@ -118,8 +118,20 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
       if (mouseReact) {
         ctn.removeEventListener('mousemove', handleMouseMove);
       }
-      ctn.removeChild(gl.canvas);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      try {
+        if (gl.canvas && gl.canvas.parentNode) {
+          ctn.removeChild(gl.canvas);
+        }
+        const loseCtx = gl.getExtension('WEBGL_lose_context');
+        if (loseCtx) {
+          loseCtx.loseContext();
+        }
+        if (renderer && renderer.gl) {
+          renderer.gl = null;
+        }
+      } catch (e) {
+        // Context already lost
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [color, speed, amplitude, mouseReact]);

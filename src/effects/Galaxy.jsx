@@ -188,6 +188,9 @@ export default function Galaxy({
   rotationSpeed = 0.1,
   autoCenterRepulsion = 0,
   transparent = true,
+  followMouse,
+  mouseInfluence,
+  interactive,
   ...rest
 }) {
   const ctnDom = useRef(null);
@@ -324,8 +327,22 @@ export default function Galaxy({
         ctn.removeEventListener('mousemove', handleMouseMove);
         ctn.removeEventListener('mouseleave', handleMouseLeave);
       }
-      ctn.removeChild(gl.canvas);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      try {
+        if (gl.canvas && gl.canvas.parentNode) {
+          ctn.removeChild(gl.canvas);
+        }
+        // Force context loss to free up resources
+        const loseCtx = gl.getExtension('WEBGL_lose_context');
+        if (loseCtx) {
+          loseCtx.loseContext();
+        }
+        // Clean up renderer
+        if (renderer && renderer.gl) {
+          renderer.gl = null;
+        }
+      } catch (e) {
+        // Context already lost or canvas removed
+      }
     };
   }, [
     focal,

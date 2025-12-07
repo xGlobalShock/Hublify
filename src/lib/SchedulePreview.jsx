@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/SchedulePreview.css';
 import { FaClock, FaGamepad, FaXmark } from 'react-icons/fa6';
 import { CiStreamOn } from 'react-icons/ci';
+import { GrScheduleNew } from 'react-icons/gr';
 
 const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisible }) => {
   if (!streamSchedule || streamSchedule.length === 0) {
@@ -9,8 +10,7 @@ const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisib
   }
 
   const upcomingStreams = [...streamSchedule]
-    .sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`))
-    .slice(0, 5);
+    .sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -47,15 +47,16 @@ const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisib
       }}
     >
       {isScheduleVisible && (
-        <div className="schedule-preview-header">
+        <div className="schedule-preview-header" style={{ position: 'relative', width: '100%' }}>
           <h3 className="schedule-preview-title">
-            <CiStreamOn className="schedule-title-icon" />
+            <GrScheduleNew className="schedule-title-icon" />
             Stream Schedule
           </h3>
           <button
             className="schedule-close-btn"
             onClick={() => setIsScheduleVisible(false)}
             title="Close schedule"
+            style={{ position: 'absolute', right: '0.9rem', top: '50%', transform: 'translateY(-50%)', left: 'auto' }}
           >
             <FaXmark />
           </button>
@@ -68,7 +69,7 @@ const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisib
           onClick={() => setIsScheduleVisible(true)}
           title="Show schedule"
         >
-          <CiStreamOn />
+          <GrScheduleNew />
         </button>
       )}
 
@@ -80,27 +81,27 @@ const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisib
                 <span className="schedule-date">{getDateLabel(stream.date)}</span>
               </div>
               
-              <div className="schedule-game">
-                <FaGamepad className="schedule-icon-game" />
-                <span>{stream.game}</span>
-              </div>
+              {stream.status === 'scheduled' ? (
+                <div className="schedule-info-group">
+                  <div className="schedule-game">
+                    <FaGamepad className="schedule-icon-game" />
+                    <span>{stream.game}</span>
+                  </div>
 
-              <div className="schedule-time">
-                <FaClock className="schedule-icon-time" />
-                <span>{stream.time} {stream.timezone}</span>
-              </div>
+                  <div className="schedule-time">
+                    <FaClock className="schedule-icon-time" />
+                    <span>{stream.time} {stream.timezone}</span>
+                  </div>
+                </div>
+              ) : (
+                <div></div>
+              )}
 
               <span className={`schedule-status-badge status-${stream.status}`}>
-                {stream.status === 'scheduled' ? '🔴 Streaming' : '⭕ No Stream'}
+                {stream.status === 'scheduled' ? 'Streaming' : 'No Stream'}
               </span>
             </div>
           ))}
-
-          {streamSchedule.length > 5 && (
-            <div className="schedule-preview-more">
-              <p>+{streamSchedule.length - 5} more streams scheduled</p>
-            </div>
-          )}
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/Settings.css';
-import { MdClose, MdPalette, MdColorLens, MdArticle, MdPerson } from 'react-icons/md';
+import { MdClose, MdPalette, MdColorLens, MdArticle, MdPerson, MdEdit, MdCheck, MdDragIndicator } from 'react-icons/md';
 import { BiChevronDown, BiLink } from 'react-icons/bi';
 import { FaPaintbrush, FaFont, FaBrush, FaUser, FaUpload, FaUsers } from 'react-icons/fa6';
 import { TbBackground } from 'react-icons/tb';
@@ -50,6 +50,13 @@ const Settings = ({
   setShowNameTextModal,
   addSocialLink,
   removeSocialLink,
+  startEditingLink,
+  saveEditedLink,
+  cancelEditingLink,
+  reorderSocialLinks,
+  editingLinkId,
+  editLinkData,
+  setEditLinkData,
   saveProfile,
   handleCancelEdit,
   handleProfilePictureChange,
@@ -58,6 +65,9 @@ const Settings = ({
   currentUser
 }) => {
   const [activeTab, setActiveTab] = useState('profile');
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [showEditPlatformDropdown, setShowEditPlatformDropdown] = useState(false);
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
   const [showStreamersManager, setShowStreamersManager] = useState(false);
   const [streamersList, setStreamersList] = useState([]);
@@ -406,7 +416,9 @@ const Settings = ({
                   )}
                 </div>
                 
+                <label htmlFor="new-social-url" className="visually-hidden">Social Link URL</label>
                 <input
+                  id="new-social-url"
                   type="url"
                   value={newLink.url}
                   onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
@@ -422,30 +434,154 @@ const Settings = ({
 
               {/* Current Social Links */}
               <div className="settings-current-socials">
-                <h4>Your Social Links ({Object.keys(socialLinks).length})</h4>
-                {Object.keys(socialLinks).length === 0 ? (
+                <h4>Your Social Links ({Array.isArray(socialLinks) ? socialLinks.length : 0})</h4>
+                {!Array.isArray(socialLinks) || socialLinks.length === 0 ? (
                   <p className="settings-empty-state">No social links added yet. Add one above!</p>
                 ) : (
                   <div className="settings-socials-list">
-                    {Object.entries(socialLinks).map(([platform, url]) => {
-                      const socialPlatform = SOCIAL_PLATFORMS.find(p => p.id === platform);
+                    {socialLinks.map((link, index) => {
+                      const socialPlatform = SOCIAL_PLATFORMS.find(p => p.id === link.platform);
+                      const isEditing = editingLinkId === link.id;
+                      
                       return (
-                        <div key={platform} className="settings-social-item">
-                          <div className="settings-social-item-info">
-                            {socialPlatform?.Icon && React.createElement(socialPlatform.Icon, { className: 'social-item-icon', style: { color: socialPlatform?.color } })}
-                            <div className="settings-social-item-details">
-                              <span className="settings-social-item-label">{socialPlatform?.label}</span>
-                              <a href={url} target="_blank" rel="noopener noreferrer" className="settings-social-item-url">
-                                {url}
-                              </a>
+                        <div 
+                          key={link.id} 
+                          className={`settings-social-item ${isEditing ? 'editing' : ''} ${draggedIndex === index ? 'dragging' : ''} ${dragOverIndex === index && draggedIndex !== index ? 'drag-over' : ''}`}
+                          draggable={!isEditing}
+                          onDragStart={(e) => {
+                            setDraggedIndex(index);
+                            e.dataTransfer.effectAllowed = 'move';
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                          }}
+                          onDragEnter={(e) => {
+                            if (draggedIndex !== null && draggedIndex !== index) {
+                              setDragOverIndex(index);
+                            }
+                          }}
+                          onDragLeave={(e) => {
+                            // Only clear if we're actually leaving this element (not entering a child)
+                            if (e.currentTarget === e.target || !e.currentTarget.contains(e.relatedTarget)) {
+                              setDragOverIndex(null);
+                            }
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setDragOverIndex(null);
+                            if (draggedIndex !== null && draggedIndex !== index) {
+                              reorderSocialLinks(draggedIndex, index);
+                            }
+                            setDraggedIndex(null);
+                          }}
+                          onDragEnd={(e) => {
+                            setDraggedIndex(null);
+                            setDragOverIndex(null);
+                          }}
+                        >
+                          {!isEditing && (
+                            <div className="settings-social-drag-handle">
+                              <MdDragIndicator />
                             </div>
-                          </div>
-                          <button
-                            className="settings-social-item-remove"
-                            onClick={() => removeSocialLink(platform)}
-                          >
-                            <i className="bx bx-x"></i>
-                          </button>
+                          )}
+                          
+                          {isEditing ? (
+                            <>
+                              <div className="settings-social-edit-form">
+                                <div className="settings-social-platform-dropdown">
+                                  <button
+                                    className="settings-social-platform-button edit"
+                                    onClick={() => setShowEditPlatformDropdown(!showEditPlatformDropdown)}
+                                  >
+                                    {(() => {
+                                      const selected = SOCIAL_PLATFORMS.find(p => p.id === editLinkData.platform);
+                                      return (
+                                        <>
+                                          {selected?.Icon && React.createElement(selected.Icon, { className: 'social-form-icon', style: { color: selected?.color } })}
+                                          <span>{selected?.label || 'Select platform'}</span>
+                                        </>
+                                      );
+                                    })()}
+                                    <BiChevronDown className="social-dropdown-chevron" />
+                                  </button>
+                                  
+                                  {showEditPlatformDropdown && (
+                                    <div className="settings-social-platform-options">
+                                      {SOCIAL_PLATFORMS.map(p => (
+                                        <button
+                                          key={p.id}
+                                          className={`settings-social-platform-option ${editLinkData.platform === p.id ? 'selected' : ''}`}
+                                          onClick={() => {
+                                            setEditLinkData({ ...editLinkData, platform: p.id });
+                                            setShowEditPlatformDropdown(false);
+                                          }}
+                                        >
+                                          {React.createElement(p.Icon, { className: 'social-option-icon', style: { color: p.color } })}
+                                          <span>{p.label}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <label htmlFor={`edit-social-url-${editingLinkId}`} className="visually-hidden">Edit Social Link URL</label>
+                                <input
+                                  id={`edit-social-url-${editingLinkId}`}
+                                  type="url"
+                                  value={editLinkData.url}
+                                  onChange={(e) => setEditLinkData({ ...editLinkData, url: e.target.value })}
+                                  placeholder="Enter URL"
+                                  className="settings-social-edit-input"
+                                />
+                              </div>
+                              
+                              <div className="settings-social-item-actions">
+                                <button
+                                  className="settings-social-item-save"
+                                  onClick={saveEditedLink}
+                                  title="Save changes"
+                                >
+                                  <MdCheck />
+                                </button>
+                                <button
+                                  className="settings-social-item-cancel"
+                                  onClick={cancelEditingLink}
+                                  title="Cancel"
+                                >
+                                  <MdClose />
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="settings-social-item-info">
+                                {socialPlatform?.Icon && React.createElement(socialPlatform.Icon, { className: 'social-item-icon', style: { color: socialPlatform?.color } })}
+                                <div className="settings-social-item-details">
+                                  <span className="settings-social-item-label">{socialPlatform?.label}</span>
+                                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="settings-social-item-url">
+                                    {link.url}
+                                  </a>
+                                </div>
+                              </div>
+                              <div className="settings-social-item-actions">
+                                <button
+                                  className="settings-social-item-edit"
+                                  onClick={() => startEditingLink(link)}
+                                  title="Edit link"
+                                >
+                                  <MdEdit />
+                                </button>
+                                <button
+                                  className="settings-social-item-remove"
+                                  onClick={() => removeSocialLink(link.id)}
+                                  title="Remove link"
+                                >
+                                  <MdClose />
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </div>
                       );
                     })}

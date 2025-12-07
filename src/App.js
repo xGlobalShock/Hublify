@@ -20,8 +20,8 @@ import BackgroundCategoryModal from './lib/BackgroundCategoryModal';
 import Settings from './pages/Settings';
 import SchedulePreview from './lib/SchedulePreview';
 import StreamersPreview from './pages/StreamersDisplay';
-import { FaXTwitter, FaInstagram, FaTiktok, FaYoutube, FaDiscord, FaTwitch, FaGithub, FaLinkedin, FaFacebook, FaReddit, FaSpotify, FaSoundcloud, FaPatreon, FaRightFromBracket, FaRightToBracket, FaCircle, FaMars, FaVenus, FaTransgender, FaQuestion } from 'react-icons/fa6';
-import { MdCoffeeMaker, MdEdit } from 'react-icons/md';
+import { FaXTwitter, FaInstagram, FaTiktok, FaYoutube, FaDiscord, FaTwitch, FaGithub, FaLinkedin, FaFacebook, FaReddit, FaSpotify, FaSoundcloud, FaPatreon, FaRightFromBracket, FaRightToBracket, FaCircle, FaMars, FaVenus, FaTransgender, FaQuestion, FaFont } from 'react-icons/fa6';
+import { MdCoffeeMaker, MdEdit, MdColorLens } from 'react-icons/md';
 import { SiRumble, SiKick } from 'react-icons/si';
 import { BsFillPersonFill } from 'react-icons/bs';
 import { MdHelp } from 'react-icons/md';
@@ -169,27 +169,11 @@ function App() {
     document.documentElement.style.setProperty('--interface-color', interfaceColor);
     document.documentElement.style.setProperty('--interface-color-rgb', hexToRgb(interfaceColor));
   }, [interfaceColor]);
-  const [socialLinks, setSocialLinks] = useState({
-    twitter: '',
-    instagram: '',
-    tiktok: '',
-    youtube: '',
-    discord: '',
-    twitch: '',
-    github: '',
-    linkedin: '',
-    facebook: '',
-    reddit: '',
-    kick: '',
-    beam: '',
-    spotify: '',
-    soundcloud: '',
-    patreon: '',
-    buymeacoffee: '',
-    rumble: ''
-  });
+  const [socialLinks, setSocialLinks] = useState([]);
   const [newLink, setNewLink] = useState({ platform: 'twitter', url: '' });
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
+  const [editingLinkId, setEditingLinkId] = useState(null);
+  const [editLinkData, setEditLinkData] = useState({ platform: '', url: '' });
   const [streamSchedule, setStreamSchedule] = useState([]);
   const [isScheduleVisible, setIsScheduleVisible] = useState(false);
   const [isStreamersVisible, setIsStreamersVisible] = useState(false);
@@ -202,7 +186,11 @@ function App() {
     { name: 'Trebuchet', value: 'trebuchet', family: '"Trebuchet MS", sans-serif' },
     { name: 'Arial', value: 'arial', family: 'Arial, sans-serif' },
     { name: 'Verdana', value: 'verdana', family: 'Verdana, sans-serif' },
-    { name: 'Impact', value: 'impact', family: 'Impact, fantasy' }
+    { name: 'Impact', value: 'impact', family: 'Impact, fantasy' },
+    { name: 'Brush Script', value: 'brush', family: '"Brush Script MT", cursive' },
+    { name: 'Copperplate', value: 'copperplate', family: 'Copperplate, fantasy' },
+    { name: 'Palatino', value: 'palatino', family: '"Palatino Linotype", "Book Antiqua", Palatino, serif' },
+    { name: 'Lucida', value: 'lucida', family: '"Lucida Console", "Lucida Sans Typewriter", monaco, monospace' }
   ];
 
   const ANIMATION_PRESETS = [
@@ -222,7 +210,11 @@ function App() {
     { name: 'Pink', hex: '#ff006e' },
     { name: 'Orange', hex: '#ff6b00' },
     { name: 'Red', hex: '#ff0000' },
-    { name: 'Yellow', hex: '#ffd700' }
+    { name: 'Yellow', hex: '#ffd700' },
+    { name: 'Teal', hex: '#14b8a6' },
+    { name: 'Indigo', hex: '#6366f1' },
+    { name: 'Violet', hex: '#8b5cf6' },
+    { name: 'Rose', hex: '#f43f5e' }
   ];
 
   // Load profile data from localStorage
@@ -278,7 +270,19 @@ function App() {
           setNameColor(profile.nameColor || '#ffffff');
           setFontFamily(profile.fontFamily || 'default');
           setNameAnimation(profile.nameAnimation || 'none');
-          setSocialLinks(profile.links || {});
+          // Convert old object format to new array format if needed
+          if (profile.links && typeof profile.links === 'object' && !Array.isArray(profile.links)) {
+            const linksArray = Object.entries(profile.links)
+              .filter(([_, url]) => url)
+              .map(([platform, url], index) => ({
+                id: Date.now().toString() + index,
+                platform,
+                url
+              }));
+            setSocialLinks(linksArray);
+          } else {
+            setSocialLinks(profile.links || []);
+          }
           setStreamSchedule(profile.streamSchedule || []);
         }
         return;
@@ -299,7 +303,19 @@ function App() {
       setNameColor(profile.nameColor || '#ffffff');
       setFontFamily(profile.fontFamily || 'default');
       setNameAnimation(profile.nameAnimation || 'none');
-      setSocialLinks(profile.links || {});
+      // Convert old object format to new array format if needed
+      if (profile.links && typeof profile.links === 'object' && !Array.isArray(profile.links)) {
+        const linksArray = Object.entries(profile.links)
+          .filter(([_, url]) => url)
+          .map(([platform, url], index) => ({
+            id: Date.now().toString() + index,
+            platform,
+            url
+          }));
+        setSocialLinks(linksArray);
+      } else {
+        setSocialLinks(profile.links || []);
+      }
       setStreamSchedule(profile.streamSchedule || []);
     }
   }, []);
@@ -458,10 +474,14 @@ function App() {
 
   const addSocialLink = () => {
     if (newLink.url.trim()) {
-      setSocialLinks({
-        ...socialLinks,
-        [newLink.platform]: newLink.url
-      });
+      const newLinkObj = {
+        id: Date.now().toString(),
+        platform: newLink.platform,
+        url: newLink.url
+      };
+      // Ensure socialLinks is always an array
+      const currentLinks = Array.isArray(socialLinks) ? socialLinks : [];
+      setSocialLinks([...currentLinks, newLinkObj]);
       setNewLink({ platform: 'twitter', url: '' });
     }
   };
@@ -591,7 +611,7 @@ function App() {
     setNameColor('#ffffff');
     setFontFamily('default');
     setNameAnimation('none');
-    setSocialLinks({});
+    setSocialLinks([]);
     setIsEditMode(false);
     
     // Clear auth
@@ -600,10 +620,40 @@ function App() {
     localStorage.removeItem('prismAuth');
   };
 
-  const removeSocialLink = (platform) => {
-    const updated = { ...socialLinks };
-    delete updated[platform];
-    setSocialLinks(updated);
+  const removeSocialLink = (linkId) => {
+    const currentLinks = Array.isArray(socialLinks) ? socialLinks : [];
+    setSocialLinks(currentLinks.filter(link => link.id !== linkId));
+  };
+
+  const startEditingLink = (link) => {
+    setEditingLinkId(link.id);
+    setEditLinkData({ platform: link.platform, url: link.url });
+  };
+
+  const saveEditedLink = () => {
+    if (editLinkData.url.trim()) {
+      const currentLinks = Array.isArray(socialLinks) ? socialLinks : [];
+      setSocialLinks(currentLinks.map(link => 
+        link.id === editingLinkId 
+          ? { ...link, platform: editLinkData.platform, url: editLinkData.url }
+          : link
+      ));
+      setEditingLinkId(null);
+      setEditLinkData({ platform: '', url: '' });
+    }
+  };
+
+  const cancelEditingLink = () => {
+    setEditingLinkId(null);
+    setEditLinkData({ platform: '', url: '' });
+  };
+
+  const reorderSocialLinks = (fromIndex, toIndex) => {
+    const currentLinks = Array.isArray(socialLinks) ? socialLinks : [];
+    const updatedLinks = [...currentLinks];
+    const [movedLink] = updatedLinks.splice(fromIndex, 1);
+    updatedLinks.splice(toIndex, 0, movedLink);
+    setSocialLinks(updatedLinks);
   };
 
   const backgroundData = BACKGROUNDS.find(bg => bg.id === background);
@@ -624,7 +674,7 @@ function App() {
   }
 
   return (
-    <div className="App" style={{ '--interface-color': interfaceColor }}>
+    <div className="App">
       {/* User Profile Header with Settings */}
       <div className="user-profile-header-wrapper">
         <div className="settings-button-container">
@@ -739,18 +789,17 @@ function App() {
         )}
 
         {/* Social Links - Only in view mode */}
-        {!isEditMode && (
+        {!isEditMode && socialLinks.length > 0 && (
           <div className="social-links-container">
-            {Object.entries(socialLinks).map(([platform, url]) => {
-              const socialPlatform = SOCIAL_PLATFORMS.find(p => p.id === platform);
+            {socialLinks.map((link) => {
+              const socialPlatform = SOCIAL_PLATFORMS.find(p => p.id === link.platform);
               return (
                 <a
-                  key={platform}
-                  href={url}
+                  key={link.id}
+                  href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="social-link-btn"
-                  style={{ borderColor: '#000000', color: '#ffffff' }}
                   title={socialPlatform?.label}
                 >
                   {React.createElement(socialPlatform?.Icon, { className: 'social-icon', style: { color: socialPlatform?.color } })}
@@ -803,6 +852,13 @@ function App() {
             setShowNameTextModal={setShowNameTextModal}
             addSocialLink={addSocialLink}
             removeSocialLink={removeSocialLink}
+            startEditingLink={startEditingLink}
+            saveEditedLink={saveEditedLink}
+            cancelEditingLink={cancelEditingLink}
+            reorderSocialLinks={reorderSocialLinks}
+            editingLinkId={editingLinkId}
+            editLinkData={editLinkData}
+            setEditLinkData={setEditLinkData}
             saveProfile={saveProfile}
             streamSchedule={streamSchedule}
             setStreamSchedule={setStreamSchedule}
@@ -881,33 +937,33 @@ function App() {
               ✕
             </button>
             <h3>Interface Colors</h3>
-            <div className="custom-color-picker">
+            <div className="modal-custom-color-picker">
               <label>Custom Color:</label>
               <input
                 type="color"
                 value={tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor}
                 onChange={(e) => {
                   setTempInterfaceColor(e.target.value);
+                  setInterfaceColor(e.target.value);
                 }}
-                className="color-input"
+                className="modal-color-input"
               />
-              <span className="color-value">{tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor}</span>
+              <span className="modal-color-value">{tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor}</span>
             </div>
-            <div className="color-buttons">
+            <div className="modal-color-grid">
               {COLOR_PRESETS.map(color => (
                 <button
                   key={color.hex}
-                  className={`color-option ${(tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor) === color.hex ? 'active' : ''}`}
-                  style={{ 
-                    backgroundColor: color.hex,
-                    borderColor: (tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor) === color.hex ? '#ffffff' : color.hex
-                  }}
+                  className={`modal-appearance-card ${(tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor) === color.hex ? 'active' : ''}`}
                   onClick={() => {
                     setTempInterfaceColor(color.hex);
+                    setInterfaceColor(color.hex);
                   }}
                   title={color.name}
                 >
-                  {color.name}
+                  <div className="modal-card-color-icon" style={{ backgroundColor: color.hex }}></div>
+                  <span className="modal-card-label">{color.name}</span>
+                  <span className="modal-card-desc">{color.hex}</span>
                 </button>
               ))}
             </div>
@@ -958,12 +1014,12 @@ function App() {
             }}>
               ✕
             </button>
-            <h3>Name & Text</h3>
+            <h3>Name & Text Styling</h3>
             
             {/* Name Color Section */}
-            <div style={{ marginBottom: '30px' }}>
-              <h4 style={{ marginBottom: '15px', fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Name Color</h4>
-              <div className="custom-color-picker">
+            <div className="modal-section">
+              <h4 className="modal-section-title">Name Color</h4>
+              <div className="modal-custom-color-picker">
                 <label>Custom Color:</label>
                 <input
                   type="color"
@@ -971,64 +1027,65 @@ function App() {
                   onChange={(e) => {
                     setTempNameColor(e.target.value);
                   }}
-                  className="color-input"
+                  className="modal-color-input"
                 />
-                <span className="color-value">{tempNameColor !== null ? tempNameColor : nameColor}</span>
+                <span className="modal-color-value">{tempNameColor !== null ? tempNameColor : nameColor}</span>
               </div>
-              <div className="color-buttons">
+              <div className="modal-color-grid">
                 {COLOR_PRESETS.map(color => (
                   <button
                     key={color.hex}
-                    className={`color-option ${(tempNameColor !== null ? tempNameColor : nameColor) === color.hex ? 'active' : ''}`}
-                    style={{ 
-                      backgroundColor: color.hex,
-                      borderColor: (tempNameColor !== null ? tempNameColor : nameColor) === color.hex ? '#ffffff' : color.hex
-                    }}
+                    className={`modal-appearance-card ${(tempNameColor !== null ? tempNameColor : nameColor) === color.hex ? 'active' : ''}`}
                     onClick={() => {
                       setTempNameColor(color.hex);
                     }}
                     title={color.name}
                   >
-                    {color.name}
+                    <div className="modal-card-color-icon" style={{ backgroundColor: color.hex }}></div>
+                    <span className="modal-card-label">{color.name}</span>
+                    <span className="modal-card-desc">{color.hex}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Font Section */}
-            <div style={{ marginBottom: '30px' }}>
-              <h4 style={{ marginBottom: '15px', fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Font Style</h4>
-              <div className="font-buttons">
+            <div className="modal-section">
+              <h4 className="modal-section-title">Font Style</h4>
+              <div className="modal-font-grid">
                 {FONT_PRESETS.map(font => (
                   <button
                     key={font.value}
-                    className={`font-option ${fontFamily === font.value ? 'active' : ''}`}
-                    style={{ fontFamily: font.family }}
+                    className={`modal-appearance-card ${fontFamily === font.value ? 'active' : ''}`}
                     onClick={() => {
                       setFontFamily(font.value);
                     }}
                     title={font.name}
                   >
-                    {font.name}
+                    <FaFont className="modal-card-icon" style={{ color: '#ffd93d' }} />
+                    <span className="modal-card-label" style={{ fontFamily: font.family }}>{font.name}</span>
+                    <span className="modal-card-desc">Font Style</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Animation Section */}
-            <div>
-              <h4 style={{ marginBottom: '15px', fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Name Animation</h4>
-              <div className="animation-buttons">
+            <div className="modal-section">
+              <h4 className="modal-section-title">Name Animation</h4>
+              <div className="modal-animation-grid">
                 {ANIMATION_PRESETS.map(animation => (
                   <button
                     key={animation.value}
-                    className={`animation-option ${(tempNameAnimation !== null ? tempNameAnimation : nameAnimation) === animation.value ? 'active' : ''}`}
+                    className={`modal-appearance-card ${(tempNameAnimation !== null ? tempNameAnimation : nameAnimation) === animation.value ? 'active' : ''}`}
                     onClick={() => {
                       setTempNameAnimation(animation.value);
                     }}
                     title={animation.name}
                   >
-                    {animation.name}
+                    <MdColorLens className="modal-card-icon" style={{ color: '#4ecdc4' }} />
+                    <span className="modal-card-label">{animation.name}</span>
+                    <span className="modal-card-desc">Animation Effect</span>
                   </button>
                 ))}
               </div>

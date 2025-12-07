@@ -34,19 +34,27 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
   ];
 
   const handleAddStream = () => {
-    if (!formData.date || !formData.time || !formData.game) {
-      alert('Please fill in all required fields');
-      return;
+    // Validation based on status
+    if (formData.status === 'scheduled') {
+      if (!formData.date || !formData.time || !formData.game) {
+        alert('Please fill in all required fields (Date, Time, and Game)');
+        return;
+      }
+    } else if (formData.status === 'nostream') {
+      if (!formData.date) {
+        alert('Please select a date');
+        return;
+      }
     }
 
     const newSchedule = [...(streamSchedule || [])];
     const entry = {
       id: editingId || Date.now(),
       date: formData.date,
-      time: formData.time,
-      game: formData.game,
+      time: formData.status === 'scheduled' ? formData.time : '',
+      game: formData.status === 'scheduled' ? formData.game : 'No Stream',
       status: formData.status,
-      timezone: formData.timezone
+      timezone: formData.status === 'scheduled' ? formData.timezone : ''
     };
 
     if (editingId) {
@@ -181,59 +189,6 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
 
             <div className="schedule-form">
               <div className="form-group">
-                <label>
-                  <FaCalendar /> Date *
-                </label>
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="schedule-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>
-                  <FaClock /> Time *
-                </label>
-                <input
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className="schedule-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Timezone</label>
-                <select
-                  value={formData.timezone}
-                  onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                  className="schedule-input"
-                >
-                  {timezones.map(tz => (
-                    <option key={tz} value={tz}>{tz}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>
-                  <FaGamepad /> Game *
-                </label>
-                <select
-                  value={formData.game}
-                  onChange={(e) => setFormData({ ...formData, game: e.target.value })}
-                  className="schedule-input"
-                >
-                  <option value="">Select a game</option>
-                  {GAMES.map(game => (
-                    <option key={game} value={game}>{game}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
                 <label>Status</label>
                 <select
                   value={formData.status}
@@ -244,6 +199,77 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
                   <option value="nostream">No Stream</option>
                 </select>
               </div>
+
+              {formData.status === 'scheduled' && (
+                <>
+                  <div className="form-group">
+                    <label>
+                      <FaCalendar /> Date *
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      className="schedule-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>
+                      <FaClock /> Time *
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.time}
+                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                      className="schedule-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Timezone</label>
+                    <select
+                      value={formData.timezone}
+                      onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                      className="schedule-input"
+                    >
+                      {timezones.map(tz => (
+                        <option key={tz} value={tz}>{tz}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>
+                      <FaGamepad /> Game *
+                    </label>
+                    <select
+                      value={formData.game}
+                      onChange={(e) => setFormData({ ...formData, game: e.target.value })}
+                      className="schedule-input"
+                    >
+                      <option value="">Select a game</option>
+                      {GAMES.map(game => (
+                        <option key={game} value={game}>{game}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {formData.status === 'nostream' && (
+                <div className="form-group">
+                  <label>
+                    <FaCalendar /> Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    className="schedule-input"
+                  />
+                </div>
+              )}
 
               <div className="schedule-modal-actions">
                 <button className="schedule-btn-cancel" onClick={resetForm}>Cancel</button>

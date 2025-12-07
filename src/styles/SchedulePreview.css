@@ -17,35 +17,79 @@
 
 /* ===== COLLAPSED STATE ===== */
 .schedule-preview-container.collapsed {
-  width: 40px !important;
-  height: 40px !important;
+  width: 50px !important;
+  height: 50px !important;
 }
 
 .schedule-preview-container.collapsed .schedule-toggle-btn {
-  width: 40px !important;
-  height: 40px !important;
+  width: 50px !important;
+  height: 50px !important;
   padding: 0 !important;
-  background-color: var(--interface-color);
-  border: none !important;
-  border-radius: 9px !important;
-  color: #ffffff !important;
+  background: linear-gradient(135deg, rgba(var(--interface-color-rgb), 0.15), rgba(var(--interface-color-rgb), 0.15)) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(var(--interface-color-rgb), 0.3) !important;
+  border-radius: 12px !important;
+  color: var(--interface-color) !important;
   font-size: 1.5rem !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  transition: all 0.25s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   flex-shrink: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 
+    0 4px 15px rgba(var(--interface-color-rgb), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.schedule-preview-container.collapsed .schedule-toggle-btn::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+.schedule-preview-container.collapsed .schedule-toggle-btn:hover::before {
+  left: 100% !important;
+}
+
+.schedule-preview-container.collapsed .schedule-toggle-btn svg {
+  width: 1.4rem !important;
+  height: 1.4rem !important;
+  margin: auto !important;
+  filter: drop-shadow(0 0 8px rgba(var(--interface-color-rgb), 0.5)) !important;
+  transition: all 0.3s ease !important;
 }
 
 .schedule-preview-container.collapsed .schedule-toggle-btn:hover {
-  transform: translateY(-3px) !important;
-  box-shadow: 0 0 10px var(--interface-color) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+  background: linear-gradient(135deg, rgba(var(--interface-color-rgb), 0.25), rgba(var(--interface-color-rgb), 0.25)) !important;
+  border-color: rgba(var(--interface-color-rgb), 0.6) !important;
+  box-shadow: 
+    0 8px 25px rgba(var(--interface-color-rgb), 0.4),
+    0 0 20px rgba(var(--interface-color-rgb), 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.schedule-preview-container.collapsed .schedule-toggle-btn:hover svg {
+  filter: drop-shadow(0 0 12px rgba(var(--interface-color-rgb), 0.8)) !important;
+  transform: scale(1.1) !important;
+}
+
+.schedule-preview-container.collapsed .schedule-toggle-btn:active {
+  transform: translateY(0) scale(0.98) !important;
 }
 
 /* ===== EXPANDED STATE ===== */
 .schedule-preview-container.expanded {
   height: auto !important;
+  min-width: 420px !important;
   z-index: 1100 !important;
   background: rgba(15, 15, 30, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -58,34 +102,35 @@
 /* ===== HEADER ===== */
 .schedule-preview-header {
   display: flex !important;
-  justify-content: space-between !important;
+  justify-content: flex-start !important;
   align-items: center !important;
   margin-bottom: 0.3rem !important;
-  padding: 0.3rem 0.4rem 0.25rem 0.4rem !important;
+  padding: 0.2rem 0.5rem 0.15rem 0.9rem !important;
+  padding-right: 3rem !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   gap: 0.4rem !important;
+  position: relative !important;
+  min-height: 35px !important;
 }
 
 .schedule-preview-title {
   margin: 0 !important;
   padding: 0 !important;
-  font-size: 0.75rem !important;
+  font-size: 0.7rem !important;
   font-weight: 700 !important;
   color: var(--interface-color) !important;
   letter-spacing: 0.3px !important;
   white-space: nowrap !important;
-  flex: 1 !important;
   text-align: left !important;
-  text-transform: uppercase !important;
   display: flex !important;
   align-items: center !important;
   gap: 0.35rem !important;
+  order: 1 !important;
 }
 
 .schedule-title-icon {
-  font-size: 1rem !important;
+  font-size: 1.25rem !important;
   color: var(--interface-color) !important;
-  flex-shrink: 0 !important;
 }
 
 .schedule-preview-header .schedule-toggle-btn {
@@ -110,7 +155,8 @@
   border-color: rgba(255, 149, 0, 0.5) !important;
 }
 
-.schedule-close-btn {
+/* Updated: Force position right */
+.schedule-preview-container .schedule-preview-header .schedule-close-btn {
   width: 26px !important;
   height: 26px !important;
   padding: 0 !important;
@@ -124,12 +170,18 @@
   justify-content: center !important;
   cursor: pointer !important;
   transition: all 0.15s ease !important;
-  flex-shrink: 0 !important;
+  position: absolute !important;
+  right: 0.9rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  left: auto !important;
+  margin: 0 !important;
 }
 
-.schedule-close-btn:hover {
+.schedule-preview-container .schedule-preview-header .schedule-close-btn:hover {
   background: rgba(102, 126, 234, 0.3) !important;
   border-color: var(--interface-color) !important;
+  transform: translateY(-50%) scale(1.05) !important;
 }
 
 /* ===== TABLE CONTAINER ===== */
@@ -137,10 +189,10 @@
   display: flex !important;
   flex-direction: column !important;
   gap: 0 !important;
-  max-height: 180px !important;
+  max-height: 400px !important;
   overflow-y: auto !important;
   margin: -0.4rem -0.4rem -0.4rem -0.4rem !important;
-  padding: 0.3rem 0.2rem 0.3rem 0.4rem !important;
+  padding: 0.2rem 0.5rem 0.2rem 0.5rem !important;
 }
 
 .schedule-preview-list::-webkit-scrollbar {
@@ -164,10 +216,10 @@
 /* ===== TABLE ROW ===== */
 .schedule-preview-item {
   display: grid !important;
-  grid-template-columns: 0.75fr 1.1fr 0.9fr auto !important;
-  gap: 0.25rem !important;
+  grid-template-columns: 80px 1fr 90px !important;
+  gap: 1rem !important;
   align-items: center !important;
-  padding: 0.3rem 0.4rem !important;
+  padding: 0.8rem 0.4rem !important;
   background: rgba(255, 255, 255, 0.02) !important;
   border: none !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
@@ -189,22 +241,22 @@
 /* ===== DATE COLUMN ===== */
 .schedule-date-badge {
   margin: 0 !important;
-  font-size: 0.65rem !important;
+  font-size: 0.7rem !important;
   font-weight: 600 !important;
   color: #ff9500 !important;
   letter-spacing: 0.2px !important;
   text-transform: capitalize !important;
   white-space: nowrap !important;
+  text-align: left !important;
 }
 
 /* ===== STATUS COLUMN ===== */
 .schedule-status-badge {
-  padding: 0.15rem 0.3rem !important;
-  border-radius: 8px !important;
-  font-size: 0.55rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.2px !important;
+  padding: 0.1rem 0.2rem !important;
+  border-radius: 3px !important;
+  font-size: 0.6rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.7px !important;
   white-space: nowrap !important;
   border: none !important;
   display: inline-flex !important;
@@ -212,7 +264,7 @@
   justify-content: center !important;
   gap: 0.2rem !important;
   width: auto !important;
-  margin-left: auto !important;
+  justify-self: end !important;
 }
 
 .schedule-status-badge.status-scheduled {
@@ -228,9 +280,17 @@
 }
 
 /* ===== GAME COLUMN ===== */
+.schedule-info-group {
+  display: grid !important;
+  grid-template-columns: 110px 100px !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  min-width: 0 !important;
+}
+
 .schedule-game {
   margin: 0 !important;
-  font-size: 0.65rem !important;
+  font-size: 0.7rem !important;
   color: rgba(255, 255, 255, 0.9) !important;
   font-weight: 500 !important;
   white-space: nowrap !important;
@@ -239,6 +299,7 @@
   display: flex !important;
   align-items: center !important;
   gap: 0.2rem !important;
+  text-align: left !important;
 }
 
 .schedule-icon-game {
@@ -251,19 +312,19 @@
 /* ===== TIME COLUMN ===== */
 .schedule-time {
   margin: 0 !important;
-  font-size: 0.63rem !important;
+  font-size: 0.7rem !important;
   color: rgba(255, 255, 255, 0.8) !important;
   font-weight: 500 !important;
-  text-align: center !important;
   white-space: nowrap !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   gap: 0.15rem !important;
+  text-align: left !important;
 }
 
 .schedule-icon-time {
-  font-size: 0.65rem !important;
+  font-size: 0.7rem !important;
   color: #ff9500 !important;
   flex-shrink: 0 !important;
   display: none !important;

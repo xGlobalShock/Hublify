@@ -21,10 +21,10 @@ console.log = (...args) => {
   const message = args.join(' ');
   
   // Filter out unwanted react-scripts messages
-    if (message.includes('webpack compiled')) return;
-    if (message.includes('You can now view')) return;
-    if (message.includes('Local:')) return;
-    if (message.includes('http://localhost')) return;
+  if (message.includes('webpack compiled')) return;
+  if (message.includes('You can now view')) return;
+  if (message.includes('Local:')) return;
+  if (message.includes('http://localhost')) return;
   if (message.includes('On Your Network:')) return;
   if (message.includes('Note that the development build')) return;
   if (message.includes('To create a production build')) return;

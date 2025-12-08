@@ -363,7 +363,6 @@
   font-weight: 600;
   font-size: 0.7rem;
   display: block;
-  text-transform: uppercase;
   letter-spacing: 0.8px;
   margin-bottom: 0.3rem;
 }
@@ -1142,12 +1141,11 @@
   border-radius: 8px;
   color: #ffffff;
   font-weight: 600;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
@@ -1650,7 +1648,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
-  background-color: var(--interface-color);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(59, 130, 246, 1));
   border: none;
   border-radius: 8px;
   padding: 0.8rem 1.5rem;
@@ -1663,7 +1661,7 @@
 
 .settings-open-streamers-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 10px rgba(var(--interface-color-rgb, 255, 149, 0), 0.4);
+  background: linear-gradient(135deg, rgba(106, 163, 253, 0.8), rgba(59, 130, 246, 1));
 }
 
 .settings-description {

@@ -103,10 +103,10 @@ const Settings = ({
   }, [showCountryDropdown, showGenderDropdown]);
 
   const SIDEBAR_ITEMS = [
-    { id: 'profile', label: 'Profile Info', Icon: FaUser },
-    { id: 'appearance', label: 'Appearance', Icon: FaPaintbrush },
-    { id: 'social', label: 'Social Links', Icon: PiLinkSimpleBold },
-    { id: 'schedule', label: 'Stream Schedule', Icon: FaCalendar },
+    { id: 'profile', label: 'Profile', Icon: FaUser },
+    { id: 'appearance', label: 'Design', Icon: FaPaintbrush },
+    { id: 'social', label: 'Links', Icon: PiLinkSimpleBold },
+    { id: 'schedule', label: 'Schedule', Icon: FaCalendar },
     { id: 'streamers', label: 'Suggested Streamers', Icon: FaUsers }
   ];
 
@@ -603,12 +603,12 @@ const Settings = ({
           {activeTab === 'streamers' && (
             <div className="settings-tab-content">
               <h3 className="settings-tab-title">Suggested Streamers</h3>
-              <p className="settings-description">Manage the list of streamers displayed on your profile. Add your favorite streamers to showcase them on your profile page.</p>
+              <p className="settings-description">Add your favorite streamers to showcase them on your profile page.</p>
               <button
                 className="settings-open-streamers-btn"
                 onClick={() => setShowStreamersManager(true)}
               >
-                <FaUsers /> Manage Streamers ({streamersList.length})
+                <FaUsers /> Manage List ({streamersList.length})
               </button>
             </div>
           )}

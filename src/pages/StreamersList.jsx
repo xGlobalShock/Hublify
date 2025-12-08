@@ -38,7 +38,7 @@ const StreamersList = ({ streamersList, setStreamersList, onClose, currentUser }
     <div className="streamers-list-modal-overlay">
       <div className="streamers-list-modal">
         <div className="streamers-list-header">
-          <h2>Manage Suggested Streamers</h2>
+          <h2>Manage Streamers List</h2>
           <button
             className="streamers-list-close-btn"
             onClick={onClose}

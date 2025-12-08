@@ -764,6 +764,26 @@ function App() {
                     />
                   : <span className="avatar-emoji-view">{profilePicture}</span>
                 }
+                {(() => {
+                  const genderOption = GENDER_OPTIONS.find(g => 
+                    g.id === profileGender || g.label === profileGender
+                  );
+                  return genderOption && 
+                         genderOption.id !== 'not-specified' && 
+                         genderOption.id !== 'prefer-not' && (
+                    <div 
+                      className="gender-icon-badge"
+                      title={genderOption.label}
+                      style={{
+                        backgroundColor: genderOption.color
+                      }}
+                    >
+                      {React.createElement(genderOption.Icon, { 
+                        className: 'gender-icon'
+                      })}
+                    </div>
+                  );
+                })()}
                 {profileCountry && profileCountry !== 'Not specified' && (
                   <img 
                     src={`https://flagpedia.net/data/flags/icon/24x18/${COUNTRY_FLAGS[profileCountry]}.png`}

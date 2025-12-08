@@ -16,7 +16,10 @@ process.emitWarning = (warning, type, code) => {
 
 // Suppress console logs from react-scripts
 const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
 let browserOpened = false;
+
 console.log = (...args) => {
   const message = args.join(' ');
   
@@ -32,6 +35,7 @@ console.log = (...args) => {
   if (message.includes('Compiled successfully')) return;
   if (message.includes('[eslint]')) return;
   if (message.includes('Search for the keywords')) return;
+  if (message.includes('to learn more about each warning')) return;
   if (message.match(/Search for the keywords to learn more about each warning\./)) return;
   if (message.includes('To ignore, add')) return;
   if (message.match(/Line \d+:\d+:/)) return;
@@ -40,6 +44,21 @@ console.log = (...args) => {
   if (message.match(/src\\/)) return;
   
   return originalLog.apply(console, args);
+};
+
+console.error = (...args) => {
+  const message = args.join(' ');
+  if (message.includes('Search for the keywords')) return;
+  if (message.includes('to learn more about each warning')) return;
+  if (message.includes('Compiled with warnings')) return;
+  return originalError.apply(console, args);
+};
+
+console.warn = (...args) => {
+  const message = args.join(' ');
+  if (message.includes('Search for the keywords')) return;
+  if (message.includes('to learn more about each warning')) return;
+  return originalWarn.apply(console, args);
 };
 
 // Start react-app-rewired

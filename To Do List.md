@@ -1,6 +1,5 @@
 > Bug Fixes:
 
-- Fix 'Search for the keywords to learn more about each warning.' Terminal message.
 - Fix Schedule Time to display 24h instead of 12h.
 - Fix and Re-size the inside modal of Stream Schedule with the buttons.
 - Fix the Header Title for Stream Schedule Similar to all the other settings tabs.
@@ -8,12 +7,6 @@
 - Fix the icons colors of Date and Time inside the " Add new Stream ".
 - Fix and add icons to Status and Timezone inside the " Add New Stream ".
 - Fix the Profile input names to display on top of each input.
-
-> New Things to add:
-
-- Display Twitch user results when typing a username, so they can be selected and added to the list.
-- Add the gender icon on the profile picture when a user chooses their gender in settings > profile, Display it similar to how the country flag is displayed but display it on the left right.
-
 
 > Make everything mobile-responsive in a professional way
 

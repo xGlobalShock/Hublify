@@ -98,6 +98,149 @@ app.post('/api/discord/callback', async (req, res) => {
 });
 
 /**
+ * Twitch User Search
+ * GET /api/twitch/search-users
+ */
+app.get('/api/twitch/search-users', async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim().length === 0) {
+    return res.json({ users: [] });
+  }
+
+  if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
+    return res.status(500).json({ error: 'Twitch credentials not configured' });
+  }
+
+  try {
+    // Get Twitch app access token
+    const tokenResponse = await fetch('https://id.twitch.tv/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: process.env.TWITCH_CLIENT_ID,
+        client_secret: process.env.TWITCH_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+      }).toString(),
+    });
+
+    if (!tokenResponse.ok) {
+      throw new Error('Failed to get Twitch access token');
+    }
+
+    const tokenData = await tokenResponse.json();
+
+    // Search for users
+    const searchResponse = await fetch(
+      `https://api.twitch.tv/helix/search/channels?query=${encodeURIComponent(query)}&first=20`,
+      {
+        headers: {
+          'Client-ID': process.env.TWITCH_CLIENT_ID,
+          'Authorization': `Bearer ${tokenData.access_token}`,
+        },
+      }
+    );
+
+    if (!searchResponse.ok) {
+      throw new Error('Failed to search Twitch users');
+    }
+
+    const searchData = await searchResponse.json();
+
+    // Format the results
+    const users = searchData.data.map(channel => ({
+      id: channel.id,
+      username: channel.broadcaster_login,
+      displayName: channel.display_name,
+      profileImage: channel.thumbnail_url ? channel.thumbnail_url.replace('{width}', '50').replace('{height}', '50') : null,
+      isLive: channel.is_live,
+    }));
+
+    res.json({ users });
+  } catch (error) {
+    console.error('Twitch search error:', error);
+    res.status(500).json({ error: 'Failed to search Twitch users' });
+  }
+});
+
+/**
+ * Get Twitch Users Data (Bulk)
+ * GET /api/twitch/users
+ * Accepts 'usernames' query param as comma-separated list
+ */
+app.get('/api/twitch/users', async (req, res) => {
+  const { usernames } = req.query;
+
+  if (!usernames || usernames.trim().length === 0) {
+    return res.json({ users: {} });
+  }
+
+  if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
+    return res.status(500).json({ error: 'Twitch credentials not configured' });
+  }
+
+  try {
+    // Get Twitch app access token
+    const tokenResponse = await fetch('https://id.twitch.tv/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: process.env.TWITCH_CLIENT_ID,
+        client_secret: process.env.TWITCH_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+      }).toString(),
+    });
+
+    if (!tokenResponse.ok) {
+      throw new Error('Failed to get Twitch access token');
+    }
+
+    const tokenData = await tokenResponse.json();
+
+    // Build query string with multiple logins (max 100 per request)
+    const usernameList = usernames.split(',').slice(0, 100);
+    const loginParams = usernameList.map(u => `login=${encodeURIComponent(u.trim())}`).join('&');
+
+    // Get user data for all usernames at once
+    const userResponse = await fetch(
+      `https://api.twitch.tv/helix/users?${loginParams}`,
+      {
+        headers: {
+          'Client-ID': process.env.TWITCH_CLIENT_ID,
+          'Authorization': `Bearer ${tokenData.access_token}`,
+        },
+      }
+    );
+
+    if (!userResponse.ok) {
+      throw new Error('Failed to get Twitch user data');
+    }
+
+    const userData = await userResponse.json();
+
+    // Map results by username for easy lookup
+    const users = {};
+    userData.data.forEach(user => {
+      users[user.login] = {
+        id: user.id,
+        username: user.login,
+        displayName: user.display_name,
+        profileImage: user.profile_image_url,
+      };
+    });
+
+    res.json({ users });
+  } catch (error) {
+    console.error('Twitch users fetch error:', error);
+    res.status(500).json({ error: 'Failed to get Twitch user data' });
+  }
+});
+
+/**
  * Health check endpoint
  */
 app.get('/api/health', (req, res) => {

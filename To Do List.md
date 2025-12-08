@@ -1,6 +1,6 @@
 > Bug Fixes:
 
-- Fix Schedule Time to display 24h instead of 12h..
+- Fix Schedule Time to display 24h instead of 12h.
 - Fix and Re-size the inside modal of Stream Schedule with the buttons.
 - Fix the Header Title for Stream Schedule Similar to all the other settings tabs.
 - Fix the .settings-tab-title::after to display properly in full width under the title.

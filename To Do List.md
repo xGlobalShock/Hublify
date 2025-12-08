@@ -11,6 +11,7 @@
 
 > New Things to add:
 
+- Display Twitch user results when typing a username, so they can be selected and added to the list.
 - Add the gender icon on the profile picture when a user chooses their gender in settings > profile, Display it similar to how the country flag is displayed but display it on the left right.
 
 

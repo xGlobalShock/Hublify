@@ -30,9 +30,3 @@ Schedule & Streamers:
 - Status badges
 - Form inputs for adding/editing
 - Use media queries for different breakpoints (mobile, tablet, desktop) to ensure everything looks perfect on all screen sizes
-
-
-> New Features:
-
-- Add a new category in the Settings similar to Change Background / Interface Colors / Name & Text Styling, Create another one Name it " Buttons Styles ", make sure it matches the same design / colors / anmiation that Change Background / Interface Colors / Name & Text Styling has.
-- Add 6 different social buttons styles / shapes / fonts / animations.

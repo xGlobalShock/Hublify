@@ -103,7 +103,7 @@ const Settings = ({
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [showCountryDropdown, showGenderDropdown]);
+  }, [showCountryDropdown, showGenderDropdown, setCountrySearch, setShowCountryDropdown]);
 
   const SIDEBAR_ITEMS = [
     { id: 'profile', label: 'Profile', Icon: FaUser },

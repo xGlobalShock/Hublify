@@ -39,14 +39,7 @@ const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisib
     return targetDate;
   };
 
-  const formatFullDate = (dayIndex) => {
-    const date = getDateForDay(dayIndex);
-    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' }); 
-    const month = date.toLocaleDateString('en-US', { month: 'long' });
-    const day = date.getDate();
-    if (isNaN(day)) return 'Invalid Date';
-    return `${weekday}, ${day} ${month}`;
-  };
+  // formatFullDate removed — not used in this component
   if (!streamSchedule || streamSchedule.length === 0) {
     return null;
   }

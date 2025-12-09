@@ -71,7 +71,8 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
 
   // Block ALL events on the isolation layer - prevents background components from receiving any events
   useEffect(() => {
-    if (!isolationRef.current) return;
+    const isolationElement = isolationRef.current;
+    if (!isolationElement) return;
     
     const blockEvent = (e) => {
       e.preventDefault();
@@ -88,7 +89,6 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
       'wheel', 'drag', 'dragstart', 'dragend'
     ];
 
-    const isolationElement = isolationRef.current;
     
     events.forEach(eventName => {
       isolationElement.addEventListener(eventName, blockEvent, { 

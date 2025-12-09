@@ -171,7 +171,9 @@ function ColorBends({
     rendererRef.current = renderer;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setClearColor(0x000000, transparent ? 0 : 1);
+    // Use default clear alpha on init (true -> transparent -> alpha 0).
+    // Actual `transparent` prop value will be applied in the update effect.
+    renderer.setClearColor(0x000000, 0);
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     renderer.domElement.style.display = 'block';

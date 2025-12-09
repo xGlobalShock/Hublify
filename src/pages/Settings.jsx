@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/Settings.css';
-import { MdClose, MdPalette, MdColorLens, MdEdit, MdCheck, MdDragIndicator } from 'react-icons/md';
+import { MdClose, MdPalette, MdEdit, MdCheck, MdDragIndicator } from 'react-icons/md';
 import { BiChevronDown } from 'react-icons/bi';
 import { FaPaintbrush, FaFont, FaUser, FaUpload, FaUsers } from 'react-icons/fa6';
 import { TbBackground } from 'react-icons/tb';

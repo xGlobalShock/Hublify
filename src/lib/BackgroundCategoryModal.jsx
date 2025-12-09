@@ -47,9 +47,10 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   useEffect(() => {
     return () => {
       // Clean up WebGL contexts and cancel animation frames
-      if (isolationRef.current) {
+      const isolationElement = isolationRef.current;
+      if (isolationElement) {
         try {
-          const canvases = isolationRef.current.querySelectorAll('canvas');
+          const canvases = isolationElement.querySelectorAll('canvas');
           canvases.forEach(canvas => {
             const gl = canvas.getContext('webgl') || canvas.getContext('webgl2') || canvas.getContext('experimental-webgl');
             if (gl) {
@@ -60,7 +61,7 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
             }
           });
           // Clear the container
-          isolationRef.current.innerHTML = '';
+          isolationElement.innerHTML = '';
         } catch (e) {
           // Ignore cleanup errors
         }

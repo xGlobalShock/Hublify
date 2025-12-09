@@ -63,11 +63,7 @@ const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisib
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
-  const getDayName = (dayIndex) => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const numDay = parseInt(dayIndex, 10);
-    return days[numDay % 7];
-  };
+  // getDayName removed — not used in this component
 
   return (
     <div 

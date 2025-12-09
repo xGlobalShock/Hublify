@@ -44,6 +44,7 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   const isolationRef = useRef(null);
 
   // Cleanup function when component unmounts or re-renders
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     return () => {
       // Clean up WebGL contexts and cancel animation frames

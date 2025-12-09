@@ -70,6 +70,7 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   }, []); // Only run on unmount, not on re-renders
 
   // Block ALL events on the isolation layer - prevents background components from receiving any events
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const isolationElement = isolationRef.current;
     if (!isolationElement) return;

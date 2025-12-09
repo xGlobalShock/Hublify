@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/StreamersList.css';
-import { FaXmark, FaTrash, FaTwitch } from 'react-icons/fa6';
+import { FaXmark, FaTwitch } from 'react-icons/fa6';
 
 const StreamersList = ({ streamersList, setStreamersList, onClose, currentUser }) => {
   const [newStreamer, setNewStreamer] = useState('');
   const [error, setError] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [, setShowDropdown] = useState(false);
   const [streamerProfiles, setStreamerProfiles] = useState({});
-  const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const [, setLoadingProfiles] = useState(false);
   const dropdownRef = useRef(null);
   const searchTimeoutRef = useRef(null);
 

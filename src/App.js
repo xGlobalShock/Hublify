@@ -15,16 +15,14 @@ import Iridescence from './effects/Iridescence';
 import LiquidChrome from './effects/LiquidChrome';
 import Login from './pages/Login';
 import OAuthCallback from './pages/OAuthCallback';
-import StaggeredBackgroundPreview from './lib/StaggeredBackgroundPreview';
 import BackgroundCategoryModal from './lib/BackgroundCategoryModal';
 import Settings from './pages/Settings';
 import SchedulePreview from './lib/SchedulePreview';
 import StreamersPreview from './pages/StreamersDisplay';
 import { FaXTwitter, FaInstagram, FaTiktok, FaYoutube, FaDiscord, FaTwitch, FaGithub, FaLinkedin, FaFacebook, FaReddit, FaSpotify, FaSoundcloud, FaPatreon, FaRightFromBracket, FaRightToBracket, FaCircle, FaMars, FaVenus, FaTransgender, FaQuestion, FaFont } from 'react-icons/fa6';
-import { MdCoffeeMaker, MdEdit, MdColorLens } from 'react-icons/md';
+import { MdCoffeeMaker, MdColorLens } from 'react-icons/md';
 import { SiRumble, SiKick } from 'react-icons/si';
-import { BsFillPersonFill } from 'react-icons/bs';
-import { MdHelp } from 'react-icons/md';
+// Removed unused icon imports to satisfy linter
 import { IoSettingsSharp } from 'react-icons/io5';
 import './App.css';
 import './styles/SchedulePreview.css';

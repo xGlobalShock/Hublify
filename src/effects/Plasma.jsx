@@ -104,7 +104,7 @@ function Plasma({
     const directionMultiplier = direction === 'reverse' ? -1.0 : 1.0;
 
     // Initialize context pool for distributed rendering
-    const pool = getWebGLContextPool(4);
+    getWebGLContextPool(4);
 
     const renderer = new Renderer({
       webgl: 2,

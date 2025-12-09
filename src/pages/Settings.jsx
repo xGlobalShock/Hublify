@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/Settings.css';
-import { MdClose, MdPalette, MdColorLens, MdArticle, MdPerson, MdEdit, MdCheck, MdDragIndicator } from 'react-icons/md';
-import { BiChevronDown, BiLink } from 'react-icons/bi';
-import { FaPaintbrush, FaFont, FaBrush, FaUser, FaUpload, FaUsers } from 'react-icons/fa6';
+import { MdClose, MdPalette, MdColorLens, MdEdit, MdCheck, MdDragIndicator } from 'react-icons/md';
+import { BiChevronDown } from 'react-icons/bi';
+import { FaPaintbrush, FaFont, FaUser, FaUpload, FaUsers } from 'react-icons/fa6';
 import { TbBackground } from 'react-icons/tb';
 import { PiLinkSimpleBold } from 'react-icons/pi';
 import { AiOutlineBgColors } from 'react-icons/ai';

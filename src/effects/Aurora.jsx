@@ -122,7 +122,7 @@ export default function Aurora(props) {
     if (!ctn) return;
 
     // Initialize context pool for distributed rendering
-    const pool = getWebGLContextPool(4);
+    getWebGLContextPool(4);
 
     const renderer = new Renderer({
       alpha: true,

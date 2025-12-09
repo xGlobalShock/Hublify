@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/SchedulePreview.css';
-import { FaClock, FaGamepad, FaXmark } from 'react-icons/fa6';
-import { CiStreamOn } from 'react-icons/ci';
+import { FaXmark } from 'react-icons/fa6';
 import { GrScheduleNew } from 'react-icons/gr';
 
 const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisible }) => {

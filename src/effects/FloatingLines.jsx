@@ -281,7 +281,7 @@ export default function FloatingLines({
     if (!containerRef.current) return;
 
     // Initialize context pool for distributed rendering
-    const pool = getWebGLContextPool(4);
+    getWebGLContextPool(4);
 
     const scene = new Scene();
 

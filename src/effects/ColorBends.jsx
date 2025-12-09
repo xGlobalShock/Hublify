@@ -160,7 +160,7 @@ function ColorBends({
     scene.add(mesh);
 
     // Initialize context pool for distributed rendering
-    const pool = getWebGLContextPool(4);
+    getWebGLContextPool(4);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: false,

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/StreamSchedule.css';
 import { MdClose, MdDelete, MdEdit, MdPublic } from 'react-icons/md';
 import { FaPlus, FaCalendar, FaClock, FaGamepad, FaCircleExclamation } from 'react-icons/fa6';
@@ -43,11 +43,6 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
     'Other'
   ];
 
-  const getDayLabel = (dayIndex) => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const numDay = parseInt(dayIndex, 10);
-    return days[numDay % 7];
-  };
 
   const getDateForDay = (dayIndex) => {
     const numDay = parseInt(dayIndex, 10);
@@ -160,10 +155,7 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
     setShowAddModal(false);
   };
 
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  };
+  // formatDate and getDayLabel removed — not used in this component
 
   const formatTime = (timeStr) => {
     if (!timeStr) return '';

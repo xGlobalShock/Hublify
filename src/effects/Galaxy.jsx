@@ -204,7 +204,7 @@ export default function Galaxy({
     const ctn = ctnDom.current;
     
     // Initialize context pool for distributed rendering
-    const pool = getWebGLContextPool(4);
+    getWebGLContextPool(4);
     
     const renderer = new Renderer({
       alpha: transparent,

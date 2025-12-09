@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 function OAuthCallback() {
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('Authenticating with Discord...');
   const hasRunRef = useRef(false);
 
@@ -79,24 +78,8 @@ function OAuthCallback() {
           console.error('Failed to save auth data:', e);
         }
 
-        // Load saved profile for this user
-        const userProfileKey = `socialProfile_${authData.user.id}`;
-        let savedProfile = null;
-        try {
-          // Try user-specific key first
-          let profileData = localStorage.getItem(userProfileKey);
-          
-          // If not found, try generic key as fallback
-          if (!profileData) {
-            profileData = localStorage.getItem('socialProfile');
-          }
-          
-          if (profileData) {
-            savedProfile = JSON.parse(profileData);
-          }
-        } catch (e) {
-          console.error('Failed to load saved profile:', e);
-        }
+        // Optionally we could load a saved profile for this user here,
+        // but the app handles profile restoration on app load.
 
         setTimeout(() => {
           // Redirect to home page

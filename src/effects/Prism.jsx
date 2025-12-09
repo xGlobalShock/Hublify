@@ -46,7 +46,7 @@ const Prism = ({
     const INERT = Math.max(0, Math.min(1, inertia || 0.12));
 
     // Initialize context pool for distributed rendering
-    const pool = getWebGLContextPool(4);
+    getWebGLContextPool(4);
 
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const renderer = new Renderer({

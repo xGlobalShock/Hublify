@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './BackgroundCategoryModal.css';
 
-// Simple render limiting to prevent too many simultaneous renders
-let renderCount = 0;
-const MAX_SIMULTANEOUS_RENDERS = 2; // Very conservative limit to prevent WebGL context exhaustion
+// Legacy render limiting removed — unused variables cleaned up
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -32,10 +30,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const CATEGORIES = [
-  { id: 'space', label: 'Space' },
-  { id: 'orb', label: 'Orb' }
-];
+// Categories: kept in design but not currently used
 
 // Isolated wrapper that renders background once and never updates
 const IsolatedBackground = React.memo(({ BackgroundComponent, props }) => {
@@ -47,7 +42,6 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   const [hasError, setHasError] = useState(false);
   const containerRef = useRef(null);
   const isolationRef = useRef(null);
-  const hasRenderedRef = useRef(false);
 
   // Cleanup function when component unmounts or re-renders
   useEffect(() => {

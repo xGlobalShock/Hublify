@@ -355,7 +355,7 @@ const Hyperspeed = ({
         this.disposed = false;
         
         // Attempt to use the context pool for distributed rendering
-        const pool = getWebGLContextPool(4);
+        getWebGLContextPool(4);
         const contextAttributes = {
           antialias: false,
           alpha: true,

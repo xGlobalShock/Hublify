@@ -44,15 +44,14 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   const isolationRef = useRef(null);
 
   // Cleanup function when component unmounts or re-renders
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
+    // capture the current isolation element at effect start so cleanup uses the same node
+    const el = isolationRef.current;
     return () => {
       // Clean up WebGL contexts and cancel animation frames
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      const isolationElement = isolationRef.current;
-      if (isolationElement) {
+      if (el) {
         try {
-          const canvases = isolationElement.querySelectorAll('canvas');
+          const canvases = el.querySelectorAll('canvas');
           canvases.forEach(canvas => {
             const gl = canvas.getContext('webgl') || canvas.getContext('webgl2') || canvas.getContext('experimental-webgl');
             if (gl) {
@@ -63,7 +62,7 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
             }
           });
           // Clear the container
-          isolationElement.innerHTML = '';
+          el.innerHTML = '';
         } catch (e) {
           // Ignore cleanup errors
         }
@@ -72,7 +71,6 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   }, []); // Only run on unmount, not on re-renders
 
   // Block ALL events on the isolation layer - prevents background components from receiving any events
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const isolationElement = isolationRef.current;
     if (!isolationElement) return;

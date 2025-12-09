@@ -48,6 +48,7 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
   useEffect(() => {
     return () => {
       // Clean up WebGL contexts and cancel animation frames
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       const isolationElement = isolationRef.current;
       if (isolationElement) {
         try {

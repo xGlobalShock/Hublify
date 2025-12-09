@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-function OAuthCallback({ onAuthComplete, onError }) {
+function OAuthCallback() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('Authenticating with Discord...');
   const hasRunRef = useRef(false);
@@ -68,6 +68,17 @@ function OAuthCallback({ onAuthComplete, onError }) {
 
         setMessage(`Welcome, ${authData.user.username}!`);
 
+        // Save auth data to localStorage
+        try {
+          localStorage.setItem('prismAuth', JSON.stringify({
+            user: authData.user,
+            accessToken: authData.accessToken,
+            timestamp: Date.now()
+          }));
+        } catch (e) {
+          console.error('Failed to save auth data:', e);
+        }
+
         // Load saved profile for this user
         const userProfileKey = `socialProfile_${authData.user.id}`;
         let savedProfile = null;
@@ -88,24 +99,21 @@ function OAuthCallback({ onAuthComplete, onError }) {
         }
 
         setTimeout(() => {
-          onAuthComplete({
-            isGuest: false,
-            user: authData.user,
-            accessToken: authData.accessToken,
-            profile: savedProfile // Pass saved profile data
-          });
+          // Redirect to home page
+          window.location.href = '/';
         }, 1500);
       } catch (err) {
         console.error('OAuth callback error:', err);
         setMessage(`Authentication Error: ${err.message}`);
         setTimeout(() => {
-          onError(err);
+          // Redirect to home on error
+          window.location.href = '/';
         }, 3000);
       }
     };
 
     handleCallback();
-  }, [onAuthComplete, onError]);
+  }, []);
 
   return (
     <div className="oauth-callback-container">

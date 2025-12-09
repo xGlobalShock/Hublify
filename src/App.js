@@ -130,6 +130,31 @@ const COUNTRIES = [
   'Zambia', 'Zimbabwe'
 ];
 
+// Migration function to convert old date-based schedules to day-based system
+const migrateScheduleToDay = (schedule) => {
+  if (!schedule || schedule.length === 0) return schedule;
+  
+  return schedule.map((item, index) => {
+    // If item already has 'day' field, return as-is
+    if (item.day !== undefined) {
+      return item;
+    }
+    
+    // If item has 'date' field, simply assign sequential days 1-7
+    // Since old schedule was stored with dates for each day of the week
+    if (item.date) {
+      const dayNumber = (index % 7) + 1; // Maps to 1-7
+      const { date, ...rest } = item;
+      return { ...rest, day: dayNumber };
+    }
+    
+    return item;
+  });
+};
+
+// No need for date conversion - using day-based schedule system now
+// Days are stored as 1-7 (Monday-Sunday) and automatically show current week
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -141,8 +166,11 @@ function App() {
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
   const [showNameTextModal, setShowNameTextModal] = useState(false);
+  const [showButtonStylesModal, setShowButtonStylesModal] = useState(false);
+  const [tempButtonStyle, setTempButtonStyle] = useState(null);
   const [nameAnimation, setNameAnimation] = useState('none');
   const [tempNameAnimation, setTempNameAnimation] = useState(null);
+  const [tempNameColor, setTempNameColor] = useState(null);
   const [profileName, setProfileName] = useState('Your Name');
   const [profileBio, setProfileBio] = useState('');
   const [profileGender, setProfileGender] = useState('Not specified');
@@ -156,8 +184,9 @@ function App() {
   // Backup state for cancel functionality
   const [backupState, setBackupState] = useState(null);
   const [fontFamily, setFontFamily] = useState('default');
+  const [tempFontFamily, setTempFontFamily] = useState(null);
+  const [buttonStyle, setButtonStyle] = useState('style1');
   const [tempInterfaceColor, setTempInterfaceColor] = useState(null);
-  const [tempNameColor, setTempNameColor] = useState(null);
 
   // Update CSS variables when interface color changes
   useEffect(() => {
@@ -269,6 +298,7 @@ function App() {
           setInterfaceColor(profile.interfaceColor || '#667eea');
           setNameColor(profile.nameColor || '#ffffff');
           setFontFamily(profile.fontFamily || 'default');
+          setButtonStyle(profile.buttonStyle || 'style1');
           setNameAnimation(profile.nameAnimation || 'none');
           // Convert old object format to new array format if needed
           if (profile.links && typeof profile.links === 'object' && !Array.isArray(profile.links)) {
@@ -283,7 +313,7 @@ function App() {
           } else {
             setSocialLinks(profile.links || []);
           }
-          setStreamSchedule(profile.streamSchedule || []);
+          setStreamSchedule(migrateScheduleToDay(profile.streamSchedule || []));
         }
         return;
       }
@@ -302,6 +332,7 @@ function App() {
       setInterfaceColor(profile.interfaceColor || '#667eea');
       setNameColor(profile.nameColor || '#ffffff');
       setFontFamily(profile.fontFamily || 'default');
+      setButtonStyle(profile.buttonStyle || 'style1');
       setNameAnimation(profile.nameAnimation || 'none');
       // Convert old object format to new array format if needed
       if (profile.links && typeof profile.links === 'object' && !Array.isArray(profile.links)) {
@@ -316,7 +347,7 @@ function App() {
       } else {
         setSocialLinks(profile.links || []);
       }
-      setStreamSchedule(profile.streamSchedule || []);
+      setStreamSchedule(migrateScheduleToDay(profile.streamSchedule || []));
     }
   }, []);
 
@@ -381,6 +412,7 @@ function App() {
       interfaceColor: finalInterfaceColor,
       nameColor: finalNameColor,
       fontFamily,
+      buttonStyle,
       nameAnimation: finalNameAnimation,
       links: socialLinks,
       streamSchedule: streamSchedule,
@@ -446,6 +478,7 @@ function App() {
       interfaceColor,
       nameColor,
       fontFamily,
+      buttonStyle,
       selectedBackground: background,
       nameAnimation,
       socialLinks: JSON.parse(JSON.stringify(socialLinks)) // Deep copy
@@ -464,6 +497,7 @@ function App() {
       setInterfaceColor(backupState.interfaceColor);
       setNameColor(backupState.nameColor);
       setFontFamily(backupState.fontFamily);
+      setButtonStyle(backupState.buttonStyle);
       setBackground(backupState.selectedBackground);
       setNameAnimation(backupState.nameAnimation);
       setSocialLinks(backupState.socialLinks);
@@ -501,6 +535,7 @@ function App() {
       interfaceColor: '#667eea',
       nameColor: '#ffffff',
       fontFamily: 'default',
+      buttonStyle: 'style1',
       nameAnimation: 'none',
       links: {},
       streamSchedule: []
@@ -522,6 +557,7 @@ function App() {
           interfaceColor: profile.interfaceColor || '#667eea',
           nameColor: profile.nameColor || '#ffffff',
           fontFamily: profile.fontFamily || 'default',
+          buttonStyle: profile.buttonStyle || 'style1',
           nameAnimation: profile.nameAnimation || 'none',
           links: profile.links || {},
           streamSchedule: profile.streamSchedule || []
@@ -543,6 +579,7 @@ function App() {
         interfaceColor: authData.profile.interfaceColor || '#667eea',
         nameColor: authData.profile.nameColor || '#ffffff',
         fontFamily: authData.profile.fontFamily || 'default',
+        buttonStyle: authData.profile.buttonStyle || 'style1',
         nameAnimation: authData.profile.nameAnimation || 'none',
         links: authData.profile.links || {},
         streamSchedule: authData.profile.streamSchedule || []
@@ -572,6 +609,7 @@ function App() {
     setInterfaceColor(profileData.interfaceColor);
     setNameColor(profileData.nameColor);
     setFontFamily(profileData.fontFamily);
+    setButtonStyle(profileData.buttonStyle);
     setNameAnimation(profileData.nameAnimation);
     setSocialLinks(profileData.links);
     setStreamSchedule(profileData.streamSchedule);
@@ -819,7 +857,12 @@ function App() {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="social-link-btn"
+                  className={`social-link-btn ${buttonStyle}`}
+                  style={{
+                    '--interface-color': interfaceColor,
+                    '--interface-color-light': interfaceColor + '33',
+                    '--interface-color-lighter': interfaceColor + '15'
+                  }}
                   title={socialPlatform?.label}
                 >
                   {React.createElement(socialPlatform?.Icon, { className: 'social-icon', style: { color: socialPlatform?.color } })}
@@ -856,6 +899,8 @@ function App() {
             setInterfaceColor={setInterfaceColor}
             fontFamily={fontFamily}
             setFontFamily={setFontFamily}
+            buttonStyle={buttonStyle}
+            setButtonStyle={setButtonStyle}
             socialLinks={socialLinks}
             setSocialLinks={setSocialLinks}
             newLink={newLink}
@@ -870,6 +915,7 @@ function App() {
             setShowBgModal={setShowBgModal}
             setShowColorModal={setShowColorModal}
             setShowNameTextModal={setShowNameTextModal}
+            setShowButtonStylesModal={setShowButtonStylesModal}
             addSocialLink={addSocialLink}
             removeSocialLink={removeSocialLink}
             startEditingLink={startEditingLink}
@@ -927,31 +973,7 @@ function App() {
         <div className="background-selector-modal" onClick={() => setShowColorModal(false)}>
           <div className="interface-color-modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-modal-btn" onClick={() => {
-              // Apply temp interface color if changed
-              if (tempInterfaceColor !== null) {
-                try {
-                  // Try to get existing profile and update just the color
-                  const userProfileKey = `socialProfile_${currentUser?.id}`;
-                  const existingProfile = localStorage.getItem(userProfileKey);
-                  if (existingProfile) {
-                    const profile = JSON.parse(existingProfile);
-                    profile.interfaceColor = tempInterfaceColor;
-                    localStorage.setItem(userProfileKey, JSON.stringify(profile));
-                  } else {
-                    // Fallback: save minimal profile with color
-                    const minimalProfile = {
-                      interfaceColor: tempInterfaceColor
-                    };
-                    localStorage.setItem(userProfileKey, JSON.stringify(minimalProfile));
-                  }
-                  setInterfaceColor(tempInterfaceColor);
-                } catch (e) {
-                  console.warn('Failed to save color:', e);
-                  // Still apply the color even if save fails
-                  setInterfaceColor(tempInterfaceColor);
-                }
-                setTempInterfaceColor(null);
-              }
+              setTempInterfaceColor(null);
               setShowColorModal(false);
             }}>
               ✕
@@ -964,7 +986,6 @@ function App() {
                 value={tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor}
                 onChange={(e) => {
                   setTempInterfaceColor(e.target.value);
-                  setInterfaceColor(e.target.value);
                 }}
                 className="modal-color-input"
               />
@@ -977,7 +998,6 @@ function App() {
                   className={`modal-appearance-card ${(tempInterfaceColor !== null ? tempInterfaceColor : interfaceColor) === color.hex ? 'active' : ''}`}
                   onClick={() => {
                     setTempInterfaceColor(color.hex);
-                    setInterfaceColor(color.hex);
                   }}
                   title={color.name}
                 >
@@ -987,6 +1007,36 @@ function App() {
                 </button>
               ))}
             </div>
+
+            {tempInterfaceColor !== null && tempInterfaceColor !== interfaceColor && (
+              <div className="modal-footer">
+                <button 
+                  className="modal-apply-btn" 
+                  onClick={() => {
+                    try {
+                      const userProfileKey = `socialProfile_${currentUser?.id}`;
+                      const existingProfile = localStorage.getItem(userProfileKey);
+                      if (existingProfile) {
+                        const profile = JSON.parse(existingProfile);
+                        profile.interfaceColor = tempInterfaceColor;
+                        localStorage.setItem(userProfileKey, JSON.stringify(profile));
+                      } else {
+                        const minimalProfile = { interfaceColor: tempInterfaceColor };
+                        localStorage.setItem(userProfileKey, JSON.stringify(minimalProfile));
+                      }
+                      setInterfaceColor(tempInterfaceColor);
+                    } catch (e) {
+                      console.warn('Failed to save color:', e);
+                      setInterfaceColor(tempInterfaceColor);
+                    }
+                    setTempInterfaceColor(null);
+                    setShowColorModal(false);
+                  }}
+                >
+                  Apply Color
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -996,40 +1046,9 @@ function App() {
         <div className="background-selector-modal" onClick={() => setShowNameTextModal(false)}>
           <div className="color-selector-modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-modal-btn" onClick={() => {
-              // Apply temp values if changed
-              if (tempNameColor !== null) {
-                setNameColor(tempNameColor);
-              }
-              if (tempNameAnimation !== null) {
-                setNameAnimation(tempNameAnimation);
-              }
-              
-              const finalNameAnimation = tempNameAnimation !== null ? tempNameAnimation : nameAnimation;
-              const finalNameColor = tempNameColor !== null ? tempNameColor : nameColor;
-              
-              try {
-                // Try to get existing profile and update just the values
-                const userProfileKey = `socialProfile_${currentUser?.id}`;
-                const existingProfile = localStorage.getItem(userProfileKey);
-                if (existingProfile) {
-                  const profile = JSON.parse(existingProfile);
-                  profile.nameColor = finalNameColor;
-                  profile.nameAnimation = finalNameAnimation;
-                  localStorage.setItem(userProfileKey, JSON.stringify(profile));
-                } else {
-                  // Fallback: save minimal profile with values
-                  const minimalProfile = {
-                    nameColor: finalNameColor,
-                    nameAnimation: finalNameAnimation
-                  };
-                  localStorage.setItem(userProfileKey, JSON.stringify(minimalProfile));
-                }
-              } catch (e) {
-                console.warn('Failed to save name/text settings:', e);
-                // Still apply the values even if save fails
-              }
               setTempNameColor(null);
               setTempNameAnimation(null);
+              setTempFontFamily(null);
               setShowNameTextModal(false);
             }}>
               ✕
@@ -1076,9 +1095,9 @@ function App() {
                 {FONT_PRESETS.map(font => (
                   <button
                     key={font.value}
-                    className={`modal-appearance-card ${fontFamily === font.value ? 'active' : ''}`}
+                    className={`modal-appearance-card ${(tempFontFamily !== null ? tempFontFamily : fontFamily) === font.value ? 'active' : ''}`}
                     onClick={() => {
-                      setFontFamily(font.value);
+                      setTempFontFamily(font.value);
                     }}
                     title={font.name}
                   >
@@ -1110,6 +1129,47 @@ function App() {
                 ))}
               </div>
             </div>
+
+            {((tempNameColor !== null && tempNameColor !== nameColor) || 
+              (tempNameAnimation !== null && tempNameAnimation !== nameAnimation) || 
+              (tempFontFamily !== null && tempFontFamily !== fontFamily)) && (
+              <div className="modal-footer">
+                <button 
+                  className="modal-apply-btn" 
+                  onClick={() => {
+                    try {
+                      const userProfileKey = `socialProfile_${currentUser?.id}`;
+                      const existingProfile = localStorage.getItem(userProfileKey);
+                      if (existingProfile) {
+                        const profile = JSON.parse(existingProfile);
+                        if (tempNameColor !== null) profile.nameColor = tempNameColor;
+                        if (tempNameAnimation !== null) profile.nameAnimation = tempNameAnimation;
+                        if (tempFontFamily !== null) profile.fontFamily = tempFontFamily;
+                        localStorage.setItem(userProfileKey, JSON.stringify(profile));
+                      } else {
+                        const minimalProfile = {};
+                        if (tempNameColor !== null) minimalProfile.nameColor = tempNameColor;
+                        if (tempNameAnimation !== null) minimalProfile.nameAnimation = tempNameAnimation;
+                        if (tempFontFamily !== null) minimalProfile.fontFamily = tempFontFamily;
+                        localStorage.setItem(userProfileKey, JSON.stringify(minimalProfile));
+                      }
+                      
+                      if (tempNameColor !== null) setNameColor(tempNameColor);
+                      if (tempNameAnimation !== null) setNameAnimation(tempNameAnimation);
+                      if (tempFontFamily !== null) setFontFamily(tempFontFamily);
+                    } catch (e) {
+                      console.warn('Failed to save name/text settings:', e);
+                    }
+                    setTempNameColor(null);
+                    setTempNameAnimation(null);
+                    setTempFontFamily(null);
+                    setShowNameTextModal(false);
+                  }}
+                >
+                  Apply Settings
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1161,6 +1221,161 @@ function App() {
           isStreamersVisible={isStreamersVisible}
           setIsStreamersVisible={setIsStreamersVisible}
         />
+      )}
+
+      {/* Button Styles Modal */}
+      {showButtonStylesModal && (
+        <div className="background-selector-modal" onClick={() => {
+          setTempButtonStyle(null);
+          setShowButtonStylesModal(false);
+        }}>
+          <div className="color-selector-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal-btn" onClick={() => {
+              setTempButtonStyle(null);
+              setShowButtonStylesModal(false);
+            }}>
+              ✕
+            </button>
+            <h3>Button Styles</h3>
+            
+            <div className="button-styles-grid">
+              {/* Style 1: Classic Round */}
+              <button
+                onClick={() => {
+                  setTempButtonStyle('style1');
+                }}
+                className={`button-style-card ${(tempButtonStyle !== null ? tempButtonStyle : buttonStyle) === 'style1' ? 'active' : ''}`}
+                title="Classic Round"
+              >
+                <div className="button-style-preview" style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '24px'
+                }}>
+                  f
+                </div>
+                <span className="button-style-name">Classic Round</span>
+              </button>
+
+              {/* Style 2: Rounded Square */}
+              <button
+                onClick={() => {
+                  setTempButtonStyle('style2');
+                }}
+                className={`button-style-card ${(tempButtonStyle !== null ? tempButtonStyle : buttonStyle) === 'style2' ? 'active' : ''}`}
+                title="Rounded Square"
+              >
+                <div className="button-style-preview" style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '24px'
+                }}>
+                  t
+                </div>
+                <span className="button-style-name">Rounded Square</span>
+              </button>
+
+              {/* Style 3: 3D Depth */}
+              <button
+                onClick={() => {
+                  setTempButtonStyle('style3');
+                }}
+                className={`button-style-card ${(tempButtonStyle !== null ? tempButtonStyle : buttonStyle) === 'style3' ? 'active' : ''}`}
+                title="3D Depth"
+              >
+                <div className="button-style-preview" style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(145deg, rgba(102, 126, 234, 0.2), rgba(102, 126, 234, 0.05))',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '24px',
+                  boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                }}>
+                  3D
+                </div>
+                <span className="button-style-name">3D Depth</span>
+              </button>
+
+              {/* Style 4: Glass Morphism */}
+              <button
+                onClick={() => {
+                  setTempButtonStyle('style4');
+                }}
+                className={`button-style-card ${(tempButtonStyle !== null ? tempButtonStyle : buttonStyle) === 'style4' ? 'active' : ''}`}
+                title="Glass Morphism"
+              >
+                <div className="button-style-preview" style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '15px',
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  backdropFilter: 'blur(4px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '24px'
+                }}>
+                  g
+                </div>
+                <span className="button-style-name">Glass Morphism</span>
+              </button>
+            </div>
+
+            <div className="button-style-info">
+              <p><strong>Current Style:</strong> {['Classic Round', 'Rounded Square', '3D Depth', 'Glass Morphism'][['style1', 'style2', 'style3', 'style4'].indexOf(tempButtonStyle !== null ? tempButtonStyle : buttonStyle)]}</p>
+              <p className="button-style-description">Your selected button style will be applied to all social media buttons on your profile.</p>
+            </div>
+
+            {tempButtonStyle !== null && tempButtonStyle !== buttonStyle && (
+              <div className="modal-footer">
+                <button 
+                  className="modal-apply-btn" 
+                  onClick={() => {
+                    try {
+                      const userProfileKey = `socialProfile_${currentUser?.id}`;
+                      const existingProfile = localStorage.getItem(userProfileKey);
+                      if (existingProfile) {
+                        const profile = JSON.parse(existingProfile);
+                        profile.buttonStyle = tempButtonStyle;
+                        localStorage.setItem(userProfileKey, JSON.stringify(profile));
+                      } else {
+                        const minimalProfile = { buttonStyle: tempButtonStyle };
+                        localStorage.setItem(userProfileKey, JSON.stringify(minimalProfile));
+                      }
+                      setButtonStyle(tempButtonStyle);
+                    } catch (e) {
+                      console.warn('Failed to save button style:', e);
+                      setButtonStyle(tempButtonStyle);
+                    }
+                    setTempButtonStyle(null);
+                    setShowButtonStylesModal(false);
+                  }}
+                >
+                  Apply Button Style
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,13 +1,3 @@
-> Bug Fixes:
-
-- Fix Schedule Time to display 24h instead of 12h.
-- Fix and Re-size the inside modal of Stream Schedule with the buttons.
-- Fix the Header Title for Stream Schedule Similar to all the other settings tabs.
-- Fix the .settings-tab-title::after to display properly in full width under the title.
-- Fix the icons colors of Date and Time inside the " Add new Stream ".
-- Fix and add icons to Status and Timezone inside the " Add New Stream ".
-- Fix the Profile input names to display on top of each input.
-
 > Make everything mobile-responsive in a professional way
 
 Main Page:

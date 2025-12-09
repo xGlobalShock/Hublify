@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/StreamSchedule.css';
-import { MdClose, MdDelete, MdEdit } from 'react-icons/md';
-import { FaPlus, FaCalendar, FaClock, FaGamepad } from 'react-icons/fa6';
+import { MdClose, MdDelete, MdEdit, MdPublic } from 'react-icons/md';
+import { FaPlus, FaCalendar, FaClock, FaGamepad, FaCircleExclamation } from 'react-icons/fa6';
 
 const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    date: '',
+    day: '',
     time: '',
     game: '',
     status: 'scheduled',
@@ -17,6 +17,16 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
   const timezones = [
     'UTC-12', 'UTC-11', 'UTC-10', 'UTC-9', 'UTC-8', 'UTC-7', 'UTC-6', 'UTC-5', 'UTC-4', 'UTC-3', 'UTC-2', 'UTC-1',
     'UTC+0', 'UTC+1', 'UTC+2', 'UTC+3', 'UTC+4', 'UTC+5', 'UTC+6', 'UTC+7', 'UTC+8', 'UTC+9', 'UTC+10', 'UTC+11', 'UTC+12'
+  ];
+
+  const DAYS_OF_WEEK = [
+    { day: 1, label: 'Monday' },
+    { day: 2, label: 'Tuesday' },
+    { day: 3, label: 'Wednesday' },
+    { day: 4, label: 'Thursday' },
+    { day: 5, label: 'Friday' },
+    { day: 6, label: 'Saturday' },
+    { day: 7, label: 'Sunday' }
   ];
 
   const GAMES = [
@@ -33,24 +43,60 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
     'Other'
   ];
 
+  const getDayLabel = (dayIndex) => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const numDay = parseInt(dayIndex, 10);
+    return days[numDay % 7];
+  };
+
+  const getDateForDay = (dayIndex) => {
+    const numDay = parseInt(dayIndex, 10);
+    const today = new Date();
+    let currentDayOfWeek = today.getDay();
+    if (currentDayOfWeek === 0) currentDayOfWeek = 7;
+
+    const offsetToMonday = 1 - currentDayOfWeek;
+    const mondayOfThisWeek = new Date();
+    mondayOfThisWeek.setDate(today.getDate() + offsetToMonday);
+
+    const targetDate = new Date(mondayOfThisWeek);
+    targetDate.setDate(mondayOfThisWeek.getDate() + (numDay - 1));
+    
+    return targetDate;
+  };
+
+  const formatFullDate = (dayIndex) => {
+    const date = getDateForDay(dayIndex);
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' }); 
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const day = date.getDate();
+    if (isNaN(day)) return 'Invalid Date';
+    return `${weekday}, ${day} ${month}`;
+  };
+
   const handleAddStream = () => {
     // Validation based on status
     if (formData.status === 'scheduled') {
-      if (!formData.date || !formData.time || !formData.game) {
-        alert('Please fill in all required fields (Date, Time, and Game)');
+      if (!formData.day || !formData.time || !formData.game) {
+        alert('Please fill in all required fields (Day, Time, and Game)');
         return;
       }
     } else if (formData.status === 'nostream') {
-      if (!formData.date) {
-        alert('Please select a date');
+      if (!formData.day) {
+        alert('Please select a day');
         return;
       }
     }
 
+    const dayNumber = parseInt(formData.day);
     const newSchedule = [...(streamSchedule || [])];
+    
+    // Check if this day already exists
+    const existingIndex = newSchedule.findIndex(s => s.day === dayNumber);
+    
     const entry = {
-      id: editingId || Date.now(),
-      date: formData.date,
+      id: editingId || (existingIndex > -1 ? newSchedule[existingIndex].id : Date.now()),
+      day: dayNumber,
       time: formData.status === 'scheduled' ? formData.time : '',
       game: formData.status === 'scheduled' ? formData.game : 'No Stream',
       status: formData.status,
@@ -58,11 +104,16 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
     };
 
     if (editingId) {
+      // Update the entry being edited
       const index = newSchedule.findIndex(s => s.id === editingId);
       if (index > -1) {
         newSchedule[index] = entry;
       }
+    } else if (existingIndex > -1) {
+      // Duplicate day exists - update it silently
+      newSchedule[existingIndex] = entry;
     } else {
+      // New entry for a new day
       newSchedule.push(entry);
     }
 
@@ -99,7 +150,7 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
 
   const resetForm = () => {
     setFormData({
-      date: '',
+      day: '',
       time: '',
       game: '',
       status: 'scheduled',
@@ -114,14 +165,20 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
 
-  const sortedSchedule = [...(streamSchedule || [])].sort((a, b) => 
-    new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`)
-  );
+  const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  const sortedSchedule = [...(streamSchedule || [])].sort((a, b) => a.day - b.day);
 
   return (
     <div className="stream-schedule-container">
       <div className="schedule-header">
-        <h3>Stream Schedule</h3>
         <button className="add-stream-btn" onClick={() => setShowAddModal(true)}>
           <FaPlus /> Add Stream
         </button>
@@ -139,11 +196,11 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
               <div className="card-content">
                 <div className="card-section date-section">
                   <span className="label">DATE</span>
-                  <span className="value">{formatDate(stream.date)}</span>
+                  <span className="value">{formatFullDate(stream.day)}</span>
                 </div>
                 <div className="card-section time-section">
                   <span className="label">TIME</span>
-                  <span className="value">{stream.time} {stream.timezone}</span>
+                  <span className="value">{formatTime(stream.time)} {stream.timezone}</span>
                 </div>
                 <div className="card-section game-section">
                   <span className="label">GAME</span>
@@ -189,7 +246,9 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
 
             <div className="schedule-form">
               <div className="form-group">
-                <label>Status</label>
+                <label>
+                  <FaCircleExclamation style={{ color: '#ec4899' }} /> Status
+                </label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
@@ -204,19 +263,23 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
                 <>
                   <div className="form-group">
                     <label>
-                      <FaCalendar /> Date *
+                      <FaCalendar style={{ color: '#3b82f6' }} /> Day *
                     </label>
-                    <input
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    <select
+                      value={formData.day}
+                      onChange={(e) => setFormData({ ...formData, day: e.target.value })}
                       className="schedule-input"
-                    />
+                    >
+                      <option value="">Select a day</option>
+                      {DAYS_OF_WEEK.map(({ day, label }) => (
+                        <option key={day} value={day}>{label}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="form-group">
                     <label>
-                      <FaClock /> Time *
+                      <FaClock style={{ color: '#8b5cf6' }} /> Time *
                     </label>
                     <input
                       type="time"
@@ -227,7 +290,9 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Timezone</label>
+                    <label>
+                      <MdPublic style={{ color: '#10b981' }} /> Timezone
+                    </label>
                     <select
                       value={formData.timezone}
                       onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
@@ -260,14 +325,18 @@ const StreamSchedule = ({ streamSchedule, setStreamSchedule, currentUser }) => {
               {formData.status === 'nostream' && (
                 <div className="form-group">
                   <label>
-                    <FaCalendar /> Date *
+                    <FaCalendar /> Day *
                   </label>
-                  <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  <select
+                    value={formData.day}
+                    onChange={(e) => setFormData({ ...formData, day: e.target.value })}
                     className="schedule-input"
-                  />
+                  >
+                    <option value="">Select a day</option>
+                    {DAYS_OF_WEEK.map(({ day, label }) => (
+                      <option key={day} value={day}>{label}</option>
+                    ))}
+                  </select>
                 </div>
               )}
 

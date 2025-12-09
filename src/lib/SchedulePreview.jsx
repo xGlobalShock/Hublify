@@ -1,39 +1,73 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/SchedulePreview.css';
 import { FaClock, FaGamepad, FaXmark } from 'react-icons/fa6';
 import { CiStreamOn } from 'react-icons/ci';
 import { GrScheduleNew } from 'react-icons/gr';
 
 const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisible }) => {
+  const [, setRefresh] = useState(0);
+
+  useEffect(() => {
+    // Check if date changed at midnight
+    const checkDateChange = () => {
+      const now = new Date();
+      const msUntilMidnight = (24 - now.getHours()) * 60 * 60 * 1000 - now.getMinutes() * 60 * 1000 - now.getSeconds() * 1000;
+      
+      const timer = setTimeout(() => {
+        setRefresh(prev => prev + 1);
+        checkDateChange(); // Reschedule for next midnight
+      }, msUntilMidnight);
+
+      return () => clearTimeout(timer);
+    };
+
+    return checkDateChange();
+  }, []);
+
+  const getDateForDay = (dayIndex) => {
+    const numDay = parseInt(dayIndex, 10);
+    const today = new Date();
+    let currentDayOfWeek = today.getDay();
+    if (currentDayOfWeek === 0) currentDayOfWeek = 7;
+
+    const offsetToMonday = 1 - currentDayOfWeek;
+    const mondayOfThisWeek = new Date();
+    mondayOfThisWeek.setDate(today.getDate() + offsetToMonday);
+
+    const targetDate = new Date(mondayOfThisWeek);
+    targetDate.setDate(mondayOfThisWeek.getDate() + (numDay - 1));
+    
+    return targetDate;
+  };
+
+  const formatFullDate = (dayIndex) => {
+    const date = getDateForDay(dayIndex);
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' }); 
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const day = date.getDate();
+    if (isNaN(day)) return 'Invalid Date';
+    return `${weekday}, ${day} ${month}`;
+  };
   if (!streamSchedule || streamSchedule.length === 0) {
     return null;
   }
 
   const upcomingStreams = [...streamSchedule]
-    .sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+    .sort((a, b) => a.day - b.day);
 
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
   };
 
-  const isToday = (dateStr) => {
-    const today = new Date();
-    const date = new Date(dateStr);
-    return date.toDateString() === today.toDateString();
-  };
-
-  const isTomorrow = (dateStr) => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const date = new Date(dateStr);
-    return date.toDateString() === tomorrow.toDateString();
-  };
-
-  const getDateLabel = (dateStr) => {
-    if (isToday(dateStr)) return 'Today';
-    if (isTomorrow(dateStr)) return 'Tomorrow';
-    return formatDate(dateStr);
+  const getDayName = (dayIndex) => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const numDay = parseInt(dayIndex, 10);
+    return days[numDay % 7];
   };
 
   return (
@@ -75,33 +109,54 @@ const SchedulePreview = ({ streamSchedule, isScheduleVisible, setIsScheduleVisib
 
       {isScheduleVisible && (
         <div className="schedule-preview-list">
-          {upcomingStreams.map((stream) => (
+          <div className="schedule-preview-header-row">
+            <span className="schedule-header-cell">Day</span>
+            <span className="schedule-header-cell">Game</span>
+            <span className="schedule-header-cell">Time</span>
+            <span className="schedule-header-cell">Timezone</span>
+            <span className="schedule-header-cell">Status</span>
+          </div>
+          {upcomingStreams.map((stream) => {
+            const date = getDateForDay(stream.day);
+            const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            return (
             <div key={stream.id} className="schedule-preview-item">
-              <div className="schedule-date-badge">
-                <span className="schedule-date">{getDateLabel(stream.date)}</span>
+              <div className="schedule-cell day-cell">
+                <span>{dateStr}</span>
               </div>
-              
-              {stream.status === 'scheduled' ? (
-                <div className="schedule-info-group">
-                  <div className="schedule-game">
-                    <FaGamepad className="schedule-icon-game" />
-                    <span>{stream.game}</span>
-                  </div>
 
-                  <div className="schedule-time">
-                    <FaClock className="schedule-icon-time" />
-                    <span>{stream.time} {stream.timezone}</span>
-                  </div>
-                </div>
-              ) : (
-                <div></div>
-              )}
+              <div className="schedule-cell game-cell">
+                {stream.status === 'scheduled' ? (
+                  <span>{stream.game}</span>
+                ) : (
+                  <span></span>
+                )}
+              </div>
 
-              <span className={`schedule-status-badge status-${stream.status}`}>
-                {stream.status === 'scheduled' ? 'Streaming' : 'No Stream'}
-              </span>
+              <div className="schedule-cell time-cell">
+                {stream.status === 'scheduled' ? (
+                  <span>{formatTime(stream.time)}</span>
+                ) : (
+                  <span></span>
+                )}
+              </div>
+
+              <div className="schedule-cell timezone-cell">
+                {stream.status === 'scheduled' ? (
+                  <span>{stream.timezone}</span>
+                ) : (
+                  <span></span>
+                )}
+              </div>
+
+              <div className="schedule-cell status-cell">
+                <span className={`schedule-status-badge status-${stream.status}`}>
+                  {stream.status === 'scheduled' ? 'Streaming' : 'No Stream'}
+                </span>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

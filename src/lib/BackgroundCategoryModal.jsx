@@ -241,18 +241,17 @@ const BackgroundCard = React.memo(({ bg, onClick, isSelected, getModalProps, isC
 });
 
 export default function BackgroundCategoryModal({ backgrounds, onSelect, onClose }) {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
   const [selectedBackground, setSelectedBackground] = useState(null);
   const selectionTimerRef = useRef(null);
 
-  const getBackgroundsForCategory = (catId) => {
-    if (catId === 'space') {
-      return backgrounds.slice(0, 8);
-    }
-    if (catId === 'orb') {
-      return backgrounds.slice(8, 16);
-    }
-    return [];
+  const backgroundsPerPage = 8;
+  const totalPages = Math.ceil(backgrounds.length / backgroundsPerPage);
+
+  const getBackgroundsForPage = (page) => {
+    const start = page * backgroundsPerPage;
+    const end = start + backgroundsPerPage;
+    return backgrounds.slice(start, end);
   };
 
   // Completely disable all interactions for backgrounds in modal
@@ -312,46 +311,54 @@ export default function BackgroundCategoryModal({ backgrounds, onSelect, onClose
 
   return (
     <div className="bg-modal-overlay">
-      <div className={`bg-modal ${!selectedCategory ? 'bg-modal-compact' : ''}`}>
-        {!selectedCategory ? (
-          <div className="bg-modal-categories">
-            <h2 className="bg-modal-title">Select Background Category</h2>
-            <div className="bg-modal-category-list">
-              {CATEGORIES.map(cat => (
-                <button key={cat.id} className="bg-modal-category-btn" onClick={() => setSelectedCategory(cat.id)}>
-                  {cat.label}
-                </button>
-              ))}
-            </div>
+      <div className="bg-modal">
+        <div className="bg-modal-backgrounds">
+          <div className="bg-modal-header">
+            <h2 className="bg-modal-title">Choose a Background</h2>
             <button className="bg-modal-close" onClick={onClose}>Close</button>
           </div>
-        ) : (
-          <div className="bg-modal-backgrounds">
-            <div className="bg-modal-header">
-              <button className="bg-modal-back" onClick={() => setSelectedCategory(null)}>&larr; Back</button>
-              <h2 className="bg-modal-title">Choose a Background</h2>
-              <button className="bg-modal-close" onClick={onClose}>Close</button>
-            </div>
-            <div className="bg-modal-preview-list">
-              {getBackgroundsForCategory(selectedCategory).map(bg => (
-                <BackgroundCard 
-                  key={bg.id} 
-                  bg={bg} 
-                  onClick={handleBackgroundSelect}
-                  isSelected={selectedBackground === bg.id}
-                  getModalProps={getModalProps}
-                />
-              ))}
-            </div>
-            {selectedBackground && (
-              <div className="bg-modal-footer">
-                <button className="bg-modal-apply-btn" onClick={handleApply}>
-                  Apply Background
-                </button>
-              </div>
-            )}
+          <div className="bg-modal-preview-list">
+            {getBackgroundsForPage(currentPage).map(bg => (
+              <BackgroundCard 
+                key={bg.id} 
+                bg={bg} 
+                onClick={handleBackgroundSelect}
+                isSelected={selectedBackground === bg.id}
+                getModalProps={getModalProps}
+              />
+            ))}
           </div>
-        )}
+          {totalPages > 1 && (
+            <div className="bg-modal-pagination">
+              {currentPage > 0 && (
+                <button 
+                  className="bg-modal-page-btn" 
+                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                >
+                  &larr; Previous
+                </button>
+              )}
+              <span className="bg-modal-page-info">
+                Page {currentPage + 1} of {totalPages}
+              </span>
+              {currentPage < totalPages - 1 && (
+                <button 
+                  className="bg-modal-page-btn" 
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                >
+                  Next &rarr;
+                </button>
+              )}
+            </div>
+          )}
+          {selectedBackground && (
+            <div className="bg-modal-footer">
+              <button className="bg-modal-apply-btn" onClick={handleApply}>
+                Apply Background
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

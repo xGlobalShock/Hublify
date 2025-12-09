@@ -34,6 +34,8 @@ const Settings = ({
   setInterfaceColor,
   fontFamily,
   setFontFamily,
+  buttonStyle,
+  setButtonStyle,
   socialLinks,
   setSocialLinks,
   newLink,
@@ -48,6 +50,7 @@ const Settings = ({
   setShowBgModal,
   setShowColorModal,
   setShowNameTextModal,
+  setShowButtonStylesModal,
   addSocialLink,
   removeSocialLink,
   startEditingLink,
@@ -350,6 +353,15 @@ const Settings = ({
                   <span className="settings-appearance-label">Name & Text Styling</span>
                   <span className="settings-appearance-desc">Font and animation settings</span>
                 </button>
+
+                <button 
+                  onClick={() => setShowButtonStylesModal(true)} 
+                  className="settings-appearance-card"
+                >
+                  <MdPalette className="settings-appearance-icon" style={{ color: '#a78bfa' }} />
+                  <span className="settings-appearance-label">Button Styles</span>
+                  <span className="settings-appearance-desc">Choose social button design</span>
+                </button>
               </div>
 
               {/* Quick Color Preview */}
@@ -591,13 +603,123 @@ const Settings = ({
             </div>
           )}
 
+          {/* Button Styles Tab */}
+          {activeTab === 'buttons' && (
+            <div className="settings-tab-content">
+              <h3 className="settings-tab-title">Button Styles</h3>
+              <p className="settings-description">Choose your preferred social button style</p>
+              
+              <div className="button-styles-grid">
+                {/* Style 1: Classic Round */}
+                <button
+                  onClick={() => setButtonStyle('style1')}
+                  className={`button-style-card ${buttonStyle === 'style1' ? 'active' : ''}`}
+                  title="Classic Round"
+                >
+                  <div className="button-style-preview" style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '24px'
+                  }}>
+                    f
+                  </div>
+                  <span className="button-style-name">Classic Round</span>
+                </button>
+
+                {/* Style 2: Rounded Square */}
+                <button
+                  onClick={() => setButtonStyle('style2')}
+                  className={`button-style-card ${buttonStyle === 'style2' ? 'active' : ''}`}
+                  title="Rounded Square"
+                >
+                  <div className="button-style-preview" style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '24px'
+                  }}>
+                    t
+                  </div>
+                  <span className="button-style-name">Rounded Square</span>
+                </button>
+
+                {/* Style 4: Glass Morphism */}
+                <button
+                  onClick={() => setButtonStyle('style4')}
+                  className={`button-style-card ${buttonStyle === 'style4' ? 'active' : ''}`}
+                  title="Glass Morphism"
+                >
+                  <div className="button-style-preview" style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '15px',
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(4px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '24px'
+                  }}>
+                    g
+                  </div>
+                  <span className="button-style-name">Glass Morphism</span>
+                </button>
+
+                {/* Style 3: 3D Depth */}
+                <button
+                  onClick={() => setButtonStyle('style3')}
+                  className={`button-style-card ${buttonStyle === 'style3' ? 'active' : ''}`}
+                  title="3D Depth"
+                >
+                  <div className="button-style-preview" style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '20px',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '24px',
+                    boxShadow: '0 10px 30px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                    transform: 'perspective(1000px) rotateX(5deg)'
+                  }}>
+                    3
+                  </div>
+                  <span className="button-style-name">3D Depth</span>
+                </button>
+              </div>
+
+              <div className="button-style-info">
+                <p><strong>Current Style:</strong> {['Classic Round', 'Rounded Square', '3D Depth', 'Glass Morphism'][['style1', 'style2', 'style3', 'style4'].indexOf(buttonStyle)]}</p>
+                <p className="button-style-description">Your selected button style will be applied to all social media buttons on your profile. Changes are saved automatically.</p>
+              </div>
+            </div>
+          )}
+
           {/* Stream Schedule Tab */}
           {activeTab === 'schedule' && (
-            <StreamSchedule 
-              streamSchedule={streamSchedule} 
-              setStreamSchedule={setStreamSchedule}
-              currentUser={currentUser}
-            />
+            <div className="settings-tab-content">
+              <h3 className="settings-tab-title">Stream Schedule</h3>
+              <StreamSchedule 
+                streamSchedule={streamSchedule} 
+                setStreamSchedule={setStreamSchedule}
+                currentUser={currentUser}
+              />
+            </div>
           )}
 
           {activeTab === 'streamers' && (

@@ -195,6 +195,35 @@
   padding: 0.2rem 0.5rem 0.2rem 0.5rem !important;
 }
 
+.schedule-preview-header-row {
+  display: grid !important;
+  grid-template-columns: 80px 1fr 90px 90px 80px !important;
+  gap: 1rem !important;
+  padding: 0.2rem 1rem !important;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.3) !important;
+  background: rgba(102, 126, 234, 0.1) !important;
+  border-radius: 1px !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.schedule-header-cell {
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  color: rgba(102, 126, 234, 0.8) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.schedule-header-cell:nth-child(3) {
+  margin-left: 0.8rem !important;
+}
+
+.schedule-header-cell:last-child {
+  text-align: right !important;
+}
+
 .schedule-preview-list::-webkit-scrollbar {
   width: 2px;
 }
@@ -216,17 +245,54 @@
 /* ===== TABLE ROW ===== */
 .schedule-preview-item {
   display: grid !important;
-  grid-template-columns: 80px 1fr 90px !important;
+  grid-template-columns: 80px 1fr 90px 90px 80px !important;
   gap: 1rem !important;
   align-items: center !important;
-  padding: 0.8rem 0.4rem !important;
+  padding: 0.8rem 1rem !important;
   background: rgba(255, 255, 255, 0.02) !important;
   border: none !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
   border-radius: 0 !important;
   transition: all 0.2s ease !important;
   position: relative !important;
-  font-size: 0.65rem !important;
+  font-size: 0.75rem !important;
+}
+
+.schedule-cell {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.schedule-cell span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.day-cell {
+  color: #ff9500 !important;
+  font-weight: 600 !important;
+}
+
+.game-cell {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.time-cell {
+  color: rgba(255, 255, 255, 0.7) !important;
+  justify-content: flex-start !important;
+  margin-left: 0.8rem !important;
+}
+
+.timezone-cell {
+  color: rgba(255, 255, 255, 0.7) !important;
+  justify-content: flex-start !important;
+}
+
+.status-cell {
+  justify-content: flex-end !important;
 }
 
 .schedule-preview-item:last-child {
@@ -252,9 +318,9 @@
 
 /* ===== STATUS COLUMN ===== */
 .schedule-status-badge {
-  padding: 0.1rem 0.2rem !important;
+  padding: 0.15rem 0.35rem !important;
   border-radius: 3px !important;
-  font-size: 0.6rem !important;
+  font-size: 0.68rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.7px !important;
   white-space: nowrap !important;

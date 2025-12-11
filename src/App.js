@@ -41,7 +41,7 @@ const BACKGROUNDS = [
   { id: 'aurora', label: 'Aurora', component: Aurora },
   { id: 'prism', label: 'Prism', component: Prism },
   { id: 'darkveil', label: 'Dark Veil', component: DarkVeil },
-  { id: 'lightpillar', label: 'Light Pillar', component: LightPillar, props: { topColor: '#FF9FFC', bottomColor: '#5227FF', intensity: 1.0, rotationSpeed: 0.3, glowAmount: 0.005, pillarWidth: 3.0, pillarHeight: 0.4, noiseIntensity: 0.5 } },
+  { id: 'lightpillar', label: 'Light Pillar', component: LightPillar, props: { topColor: '#FF9FFC', bottomColor: '#5227FF', intensity: 1.0, rotationSpeed: 0.0, glowAmount: 0.002, pillarWidth: 3.0, pillarHeight: 0.4, noiseIntensity: 0 } },
   { id: 'iridescence', label: 'Iridescence', component: Iridescence, props: { color: [1, 1, 1], mouseReact: false, amplitude: 0.1, speed: 1.0 } },
   { id: 'liquidchrome', label: 'Liquid Chrome', component: LiquidChrome, props: { baseColor: [0.1, 0.1, 0.1], speed: 0.2, amplitude: 0.3, interactive: false } }
 ];

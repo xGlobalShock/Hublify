@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import './LightPillar.css';
 
@@ -6,15 +6,15 @@ const LightPillar = ({
   topColor = '#5227FF',
   bottomColor = '#FF9FFC',
   intensity = 1.0,
-  rotationSpeed = 0.3,
+  rotationSpeed = 1.0,
   interactive = false,
   className = '',
-  glowAmount = 0.005,
+  glowAmount = 0.02,
   pillarWidth = 3.0,
   pillarHeight = 0.4,
   noiseIntensity = 0.5,
   mixBlendMode = 'screen',
-  pillarRotation = 0
+  pillarRotation = 25
 }) => {
   const containerRef = useRef(null);
   const rafRef = useRef(null);
@@ -41,58 +41,50 @@ const LightPillar = ({
     if (!containerRef.current || !webGLSupported) return;
 
     const container = containerRef.current;
-    
-    // Wait for container to have dimensions
-    const initializeRenderer = () => {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      
-      if (width === 0 || height === 0) {
-        requestAnimationFrame(initializeRenderer);
-        return;
-      }
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
-      // Create scene
-      const scene = new THREE.Scene();
-      sceneRef.current = scene;
+    // Scene setup
+    const scene = new THREE.Scene();
+    sceneRef.current = scene;
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    cameraRef.current = camera;
 
-      // Create camera
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-      cameraRef.current = camera;
-
-      // Create renderer with debug context
-      const renderer = new THREE.WebGLRenderer({ 
-        alpha: true,
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
         antialias: false,
-        powerPreference: "high-performance"
+        alpha: true,
+        powerPreference: 'high-performance',
+        precision: 'lowp',
+        stencil: false,
+        depth: false
       });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.debug.checkShaderErrors = true;
-      container.appendChild(renderer.domElement);
-      rendererRef.current = renderer;
-      
-      // Listen for WebGL context errors
-      const canvas = renderer.domElement;
-      canvas.addEventListener('webglcontextlost', (event) => {
-        event.preventDefault();
-        console.error('WebGL context lost!');
-      });
-      canvas.addEventListener('webglcontextrestored', () => {
-        console.log('WebGL context restored');
-      });
+    } catch (error) {
+      console.error('Failed to create WebGL renderer:', error);
+      setWebGLSupported(false);
+      return;
+    }
 
-      // Create geometry
-      const geometry = new THREE.PlaneGeometry(2, 2);
-      geometryRef.current = geometry;
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
 
-      const vertexShader = `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = vec4(position, 1.0);
-        }
-      `;
+    // Convert hex colors to RGB
+    const parseColor = hex => {
+      const color = new THREE.Color(hex);
+      return new THREE.Vector3(color.r, color.g, color.b);
+    };
+
+    // Shader material
+    const vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }
+    `;
 
     const fragmentShader = `
       uniform float uTime;
@@ -107,6 +99,7 @@ const LightPillar = ({
       uniform float uPillarHeight;
       uniform float uNoiseIntensity;
       uniform float uPillarRotation;
+      uniform float uRotationSpeed;
       varying vec2 vUv;
 
       const float PI = 3.141592653589793;
@@ -163,13 +156,13 @@ const LightPillar = ({
         float rotAngle = uPillarRotation * PI / 180.0;
         uv *= rot(rotAngle);
 
-        vec3 origin = vec3(0.0, 0.0, -10.0);
+        vec3 origin = vec3(0.0, 1.0, -10.0);
         vec3 direction = normalize(vec3(uv, 1.0));
 
         float maxDepth = 50.0;
         float depth = 0.1;
 
-        mat2 rotX = rot(uTime * 0.3);
+        mat2 rotX = rot(uTime * uRotationSpeed);
         if(uInteractive && length(uMouse) > 0.0) {
           rotX = rot(uMouse.x * PI * 2.0);
         }
@@ -194,7 +187,7 @@ const LightPillar = ({
           fieldDistance = blendMax(radialBound, fieldDistance, 1.0);
           fieldDistance = abs(fieldDistance) * 0.15 + 0.01;
 
-          vec3 gradient = mix(uBottomColor, uTopColor, smoothstep(15.0, -15.0, pos.y));
+          vec3 gradient = mix(uBottomColor, uTopColor, smoothstep(-15.0, 15.0, pos.y));
           color += gradient * pow(1.0 / fieldDistance, 1.0);
 
           if(fieldDistance < EPSILON || depth > maxDepth) break;
@@ -213,135 +206,139 @@ const LightPillar = ({
       }
     `;
 
-      // Create material
-      const material = new THREE.ShaderMaterial({
-        vertexShader,
-        fragmentShader,
-        uniforms: {
-          uTime: { value: 0 },
-          uResolution: { value: new THREE.Vector2(width, height) },
-          uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-          uTopColor: { value: new THREE.Color(topColor) },
-          uBottomColor: { value: new THREE.Color(bottomColor) },
-          uIntensity: { value: intensity },
-          uInteractive: { value: interactive },
-          uGlowAmount: { value: glowAmount },
-          uPillarWidth: { value: pillarWidth },
-          uPillarHeight: { value: pillarHeight },
-          uNoiseIntensity: { value: noiseIntensity },
-          uPillarRotation: { value: pillarRotation }
-        },
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-      
-      materialRef.current = material;
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        uTime: { value: 0 },
+        uResolution: { value: new THREE.Vector2(width, height) },
+        uMouse: { value: mouseRef.current },
+        uTopColor: { value: parseColor(topColor) },
+        uBottomColor: { value: parseColor(bottomColor) },
+        uIntensity: { value: intensity },
+        uInteractive: { value: interactive },
+        uGlowAmount: { value: glowAmount },
+        uPillarWidth: { value: pillarWidth },
+        uPillarHeight: { value: pillarHeight },
+        uNoiseIntensity: { value: noiseIntensity },
+        uPillarRotation: { value: pillarRotation },
+        uRotationSpeed: { value: rotationSpeed }
+      },
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false
+    });
+    materialRef.current = material;
 
-      // Create mesh
-      const mesh = new THREE.Mesh(geometry, material);
-      scene.add(mesh);
-      
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    geometryRef.current = geometry;
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
 
+    // Mouse interaction - throttled for performance
+    let mouseMoveTimeout = null;
+    const handleMouseMove = event => {
+      if (!interactive) return;
 
-      // Mouse move handler with throttling
-      let lastMouseUpdate = 0;
-      const handleMouseMove = (event) => {
-        if (!interactive) return;
-        
-        const now = Date.now();
-        if (now - lastMouseUpdate < 16) return; // Throttle to ~60fps
-        lastMouseUpdate = now;
+      if (mouseMoveTimeout) return;
 
-        const rect = container.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        mouseRef.current.set(x, y);
-        
-        if (materialRef.current) {
-          materialRef.current.uniforms.uMouse.value.copy(mouseRef.current);
-        }
-      };
+      mouseMoveTimeout = window.setTimeout(() => {
+        mouseMoveTimeout = null;
+      }, 16); // ~60fps throttle
 
-      if (interactive) {
-        window.addEventListener('mousemove', handleMouseMove);
-      }
-
-      // Animation loop
-      const targetFPS = 60;
-      const frameTime = 1000 / targetFPS;
-      let lastFrameTime = performance.now();
-      
-      const animate = (currentTime) => {
-        rafRef.current = requestAnimationFrame(animate);
-        
-        const elapsed = currentTime - lastFrameTime;
-        if (elapsed < frameTime) return;
-        
-        lastFrameTime = currentTime - (elapsed % frameTime);
-        
-        timeRef.current += 0.016 * rotationSpeed;
-        
-        if (materialRef.current) {
-          materialRef.current.uniforms.uTime.value = timeRef.current;
-        }
-        
-        if (rendererRef.current && sceneRef.current && cameraRef.current) {
-          rendererRef.current.render(sceneRef.current, cameraRef.current);
-        }
-      };
-
-      rafRef.current = requestAnimationFrame(animate);
-
-      // Handle window resize with debouncing
-      let resizeTimeout;
-      const handleResize = () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-          const newWidth = container.clientWidth;
-          const newHeight = container.clientHeight;
-          
-          if (rendererRef.current && materialRef.current) {
-            rendererRef.current.setSize(newWidth, newHeight);
-            materialRef.current.uniforms.uResolution.value.set(newWidth, newHeight);
-          }
-        }, 150);
-      };
-
-      window.addEventListener('resize', handleResize);
-
-      // Cleanup
-      return () => {
-        if (interactive) {
-          window.removeEventListener('mousemove', handleMouseMove);
-        }
-        window.removeEventListener('resize', handleResize);
-        clearTimeout(resizeTimeout);
-        
-        if (rafRef.current) {
-          cancelAnimationFrame(rafRef.current);
-        }
-        
-        if (rendererRef.current) {
-          rendererRef.current.dispose();
-          if (container.contains(rendererRef.current.domElement)) {
-            container.removeChild(rendererRef.current.domElement);
-          }
-        }
-        
-        if (materialRef.current) {
-          materialRef.current.dispose();
-        }
-        
-        if (geometryRef.current) {
-          geometryRef.current.dispose();
-        }
-      };
+      const rect = container.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      mouseRef.current.set(x, y);
     };
 
-    const cleanup = initializeRenderer();
-    return cleanup;
-  }, [topColor, bottomColor, intensity, rotationSpeed, interactive, glowAmount, pillarWidth, pillarHeight, noiseIntensity, pillarRotation, webGLSupported]);
+    if (interactive) {
+      container.addEventListener('mousemove', handleMouseMove, { passive: true });
+    }
+
+    // Animation loop with fixed timestep
+    let lastTime = performance.now();
+    const targetFPS = 60;
+    const frameTime = 1000 / targetFPS;
+
+    const animate = currentTime => {
+      if (!materialRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current) return;
+
+      const deltaTime = currentTime - lastTime;
+
+      if (deltaTime >= frameTime) {
+        timeRef.current += 0.016;
+        materialRef.current.uniforms.uTime.value = timeRef.current;
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+        lastTime = currentTime - (deltaTime % frameTime);
+      }
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
+
+    // Handle resize with debouncing
+    let resizeTimeout = null;
+    const handleResize = () => {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+
+      resizeTimeout = window.setTimeout(() => {
+        if (!rendererRef.current || !materialRef.current || !containerRef.current) return;
+        const newWidth = containerRef.current.clientWidth;
+        const newHeight = containerRef.current.clientHeight;
+        rendererRef.current.setSize(newWidth, newHeight);
+        materialRef.current.uniforms.uResolution.value.set(newWidth, newHeight);
+      }, 150);
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (interactive) {
+        container.removeEventListener('mousemove', handleMouseMove);
+      }
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      if (rendererRef.current) {
+        rendererRef.current.dispose();
+        rendererRef.current.forceContextLoss();
+        if (container.contains(rendererRef.current.domElement)) {
+          container.removeChild(rendererRef.current.domElement);
+        }
+      }
+      if (materialRef.current) {
+        materialRef.current.dispose();
+      }
+      if (geometryRef.current) {
+        geometryRef.current.dispose();
+      }
+
+      rendererRef.current = null;
+      materialRef.current = null;
+      sceneRef.current = null;
+      cameraRef.current = null;
+      geometryRef.current = null;
+      rafRef.current = null;
+    };
+  }, [
+    topColor,
+    bottomColor,
+    intensity,
+    rotationSpeed,
+    interactive,
+    glowAmount,
+    pillarWidth,
+    pillarHeight,
+    noiseIntensity,
+    pillarRotation,
+    webGLSupported
+  ]);
 
   if (!webGLSupported) {
     return (

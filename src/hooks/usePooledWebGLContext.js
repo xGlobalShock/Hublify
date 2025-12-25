@@ -1,10 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { getWebGLContextPool } from '../utils/WebGLContextPool';
-
-/**
- * Hook to use a pooled WebGL context instead of creating individual contexts
- * This distributes the load across multiple contexts to prevent exhaustion
- */
 export function usePooledWebGLContext(canvasRef, poolSize = 4) {
   const contextRef = useRef(null);
 
@@ -19,7 +14,6 @@ export function usePooledWebGLContext(canvasRef, poolSize = 4) {
     }
 
     return () => {
-      // Don't dispose the context - it's managed by the pool
     };
   }, [canvasRef, poolSize]);
 

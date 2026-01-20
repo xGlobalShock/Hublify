@@ -16,6 +16,13 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Set security headers
+app.use((req, res, next) => {
+  // Permissions-Policy header (replaces Feature-Policy)
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  next();
+});
+
 /**
  * Discord OAuth Callback Handler
  * POST /api/discord/callback
@@ -84,6 +91,7 @@ app.post('/api/discord/callback', async (req, res) => {
         email: userData.email,
         avatar: avatarUrl,
         discriminator: userData.discriminator,
+        is_onboarded: false  // New users start as not onboarded
       },
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
@@ -96,6 +104,128 @@ app.post('/api/discord/callback', async (req, res) => {
     });
   }
 });
+
+/**
+ * Complete User Setup / Onboarding
+ * POST /api/user/setup
+ * Body: { name, gender, country, description, profileLinks }
+ */
+app.post('/api/user/setup', (req, res) => {
+  try {
+    const { name, gender, country, description, profileLinks } = req.body;
+
+    // Validate required fields
+    if (!name || !name.trim()) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Name is required' 
+      });
+    }
+
+    if (!gender) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Gender is required' 
+      });
+    }
+
+    if (!country) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Country is required' 
+      });
+    }
+
+    // Validate name length
+    if (name.length > 100) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Name must be 100 characters or less' 
+      });
+    }
+
+    // Validate description length
+    if (description && description.length > 500) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Description must be 500 characters or less' 
+      });
+    }
+
+    // Validate profile links if provided
+    if (profileLinks && Array.isArray(profileLinks)) {
+      for (const link of profileLinks) {
+        if (link.url && !isValidUrl(link.url)) {
+          return res.status(400).json({ 
+            success: false,
+            error: `Invalid URL for ${link.platform}` 
+          });
+        }
+      }
+    }
+
+    // In a real database, we would update the user with is_onboarded = true
+    // For now, we'll return success since we're using localStorage on the frontend
+    
+    res.json({
+      success: true,
+      message: 'Setup completed successfully',
+      user: {
+        is_onboarded: true,
+        profile: {
+          name,
+          gender,
+          country,
+          description,
+          profileLinks
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Setup error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Setup failed' 
+    });
+  }
+});
+
+/**
+ * Reset User Profile / Onboarding
+ * POST /api/user/reset
+ * Resets the user's onboarding status so they can setup again
+ */
+app.post('/api/user/reset', (req, res) => {
+  try {
+    // In a real database, we would reset is_onboarded = false
+    // For now, we just confirm the reset
+    res.json({
+      success: true,
+      message: 'Profile reset successfully. Please clear localStorage and refresh.',
+      user: {
+        is_onboarded: false
+      }
+    });
+  } catch (error) {
+    console.error('Reset error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Reset failed' 
+    });
+  }
+});
+
+/**
+ * Utility function to validate URLs
+ */
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
 
 /**
  * Twitch User Search

@@ -15,6 +15,7 @@ import Iridescence from './effects/Iridescence';
 import LiquidChrome from './effects/LiquidChrome';
 import Login from './pages/Login';
 import OAuthCallback from './pages/OAuthCallback';
+import ProfileSetup from './pages/ProfileSetup';
 import BackgroundCategoryModal from './lib/BackgroundCategoryModal';
 import Settings from './pages/Settings';
 import SchedulePreview from './lib/SchedulePreview';
@@ -27,6 +28,7 @@ import { IoSettingsSharp } from 'react-icons/io5';
 import './App.css';
 import './styles/SchedulePreview.css';
 import './styles/StreamersPreview.css';
+import './styles/ProfileSetup.css';
 
 const BACKGROUNDS = [
   { id: 'lightrays-white', label: 'Light Rays (White)', component: LightRays, props: { raysColor: '#ffffff' } },
@@ -156,6 +158,7 @@ const migrateScheduleToDay = (schedule) => {
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isOnboarded, setIsOnboarded] = useState(false);
   const [isProcessingAuth, setIsProcessingAuth] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [background, setBackground] = useState('lightrays-blue');
@@ -278,15 +281,45 @@ function App() {
     const savedAuth = localStorage.getItem('prismAuth');
     if (savedAuth) {
       const auth = JSON.parse(savedAuth);
+      console.log('🔍 Found saved auth:', auth.user);
       // Only restore if NOT a guest user (guest sessions don't persist)
       if (!auth.user?.id?.startsWith('guest_')) {
         setCurrentUser(auth.user);
         setIsAuthenticated(true);
+        console.log('🔍 Looking for profile with key:', `socialProfile_${auth.user?.id}`);
+        
         // Load user-specific profile data
         const userProfileKey = `socialProfile_${auth.user?.id}`;
         const savedProfile = localStorage.getItem(userProfileKey) || localStorage.getItem('socialProfile');
+        
+        // Check if user is onboarded: either marked in auth OR has a saved profile with required fields
+        let isOnboardedStatus = auth.user?.is_onboarded === true;
+        
+        if (!isOnboardedStatus && savedProfile) {
+          try {
+            const profile = JSON.parse(savedProfile);
+            // If they have a profile with required fields, they're onboarded
+            if (profile.name && profile.name !== 'Your Name' && profile.gender && profile.country) {
+              console.log('✅ Profile found with required fields - marking as onboarded');
+              isOnboardedStatus = true;
+              // Update auth to reflect onboarded status
+              auth.user.is_onboarded = true;
+              localStorage.setItem('prismAuth', JSON.stringify(auth));
+            }
+          } catch (e) {
+            console.error('Failed to parse profile:', e);
+          }
+        }
+        
+        if (isOnboardedStatus) {
+          console.log('✅ User marked as onboarded');
+          setIsOnboarded(true);
+        }
+        
+        // Load the profile data into state
         if (savedProfile) {
           const profile = JSON.parse(savedProfile);
+          console.log('✅ Loading profile data:', profile.name);
           setBackground(profile.background || 'hyperspeed');
           setProfileName(profile.name || 'Your Name');
           setProfileBio(profile.bio || '');
@@ -312,6 +345,8 @@ function App() {
             setSocialLinks(profile.links || []);
           }
           setStreamSchedule(migrateScheduleToDay(profile.streamSchedule || []));
+        } else {
+          console.log('⚠️ No saved profile found');
         }
         return;
       }
@@ -519,6 +554,7 @@ function App() {
   };
 
   const handleAuthSuccess = (authData) => {
+    console.log('🔐 Login successful, auth data:', authData.user);
     // Save auth immediately
     localStorage.setItem('prismAuth', JSON.stringify(authData));
     
@@ -543,6 +579,7 @@ function App() {
     const userProfileKey = `socialProfile_${authData.user.id}`;
     const savedProfile = localStorage.getItem(userProfileKey);
     if (savedProfile) {
+      console.log('✅ Found saved profile:', userProfileKey);
       try {
         const profile = JSON.parse(savedProfile);
         profileData = {
@@ -563,6 +600,9 @@ function App() {
       } catch (e) {
         console.error('Failed to parse saved profile:', e);
       }
+    } else {
+      console.log('⚠️ No saved profile found for key:', userProfileKey);
+      console.log('📦 Available localStorage keys:', Object.keys(localStorage).filter(k => k.includes('social')));
     }
 
     // For Discord users, use passed profile if available (but don't override saved data)
@@ -594,23 +634,50 @@ function App() {
       profileData.picture = sessionImage || '👤';
     }
 
+    // Check if user is onboarded
+    // User is considered onboarded if: 
+    // 1. Backend says so, OR 
+    // 2. They have existing profile data in localStorage (with name/gender/country)
+    let isUserOnboarded = authData.user?.is_onboarded === true;
+    
+    // If not explicitly onboarded by backend, check if they have profile data
+    if (!isUserOnboarded && savedProfile) {
+      try {
+        const profile = JSON.parse(savedProfile);
+        // If they have filled in required fields, they're already onboarded
+        if (profile.name && profile.name !== 'Your Name' && profile.gender && profile.country) {
+          isUserOnboarded = true;
+          // Update auth data to reflect they're onboarded
+          authData.user.is_onboarded = true;
+          localStorage.setItem('prismAuth', JSON.stringify(authData));
+        }
+      } catch (e) {
+        console.error('Failed to check profile onboarding status:', e);
+      }
+    }
+
     // Set all state together
     setCurrentUser(authData.user);
     setIsAuthenticated(true);
+    setIsOnboarded(isUserOnboarded);
     setIsProcessingAuth(false);
-    setBackground(profileData.background);
-    setProfileName(profileData.name);
-    setProfileBio(profileData.bio);
-    setProfileGender(profileData.gender);
-    setProfileCountry(profileData.country);
-    setProfilePicture(profileData.picture);
-    setInterfaceColor(profileData.interfaceColor);
-    setNameColor(profileData.nameColor);
-    setFontFamily(profileData.fontFamily);
-    setButtonStyle(profileData.buttonStyle);
-    setNameAnimation(profileData.nameAnimation);
-    setSocialLinks(profileData.links);
-    setStreamSchedule(profileData.streamSchedule);
+    
+    // Only load profile data if user is onboarded
+    if (isUserOnboarded) {
+      setBackground(profileData.background);
+      setProfileName(profileData.name);
+      setProfileBio(profileData.bio);
+      setProfileGender(profileData.gender);
+      setProfileCountry(profileData.country);
+      setProfilePicture(profileData.picture);
+      setInterfaceColor(profileData.interfaceColor);
+      setNameColor(profileData.nameColor);
+      setFontFamily(profileData.fontFamily);
+      setButtonStyle(profileData.buttonStyle);
+      setNameAnimation(profileData.nameAnimation);
+      setSocialLinks(profileData.links);
+      setStreamSchedule(profileData.streamSchedule);
+    }
     
     // Clear URL params
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -652,6 +719,7 @@ function App() {
     
     // Clear auth
     setIsAuthenticated(false);
+    setIsOnboarded(false);
     setCurrentUser(null);
     localStorage.removeItem('prismAuth');
   };
@@ -706,6 +774,18 @@ function App() {
     return <Login 
       onLoginSuccess={handleAuthSuccess} 
       BACKGROUNDS={BACKGROUNDS}
+    />;
+  }
+
+  // Show profile setup screen if authenticated but not onboarded
+  // Skip for guest users - they don't need to complete setup
+  if (!isOnboarded && currentUser && !currentUser.id?.startsWith('guest_')) {
+    return <ProfileSetup 
+      currentUser={currentUser}
+      onSetupComplete={() => {
+        // Reload page to get updated user data with is_onboarded flag
+        window.location.reload();
+      }}
     />;
   }
 
@@ -849,6 +929,7 @@ function App() {
           <div className="social-links-container">
             {socialLinks.map((link) => {
               const socialPlatform = SOCIAL_PLATFORMS.find(p => p.id === link.platform);
+              if (!socialPlatform) return null;
               return (
                 <a
                   key={link.id}
@@ -861,10 +942,10 @@ function App() {
                     '--interface-color-light': interfaceColor + '33',
                     '--interface-color-lighter': interfaceColor + '15'
                   }}
-                  title={socialPlatform?.label}
+                  title={socialPlatform.label}
                 >
-                  {React.createElement(socialPlatform?.Icon, { className: 'social-icon', style: { color: socialPlatform?.color } })}
-                  <span className="social-label">{socialPlatform?.label}</span>
+                  {React.createElement(socialPlatform.Icon, { className: 'social-icon', style: { color: socialPlatform.color } })}
+                  <span className="social-label">{socialPlatform.label}</span>
                 </a>
               );
             })}

@@ -39,8 +39,9 @@ const StreamersList = ({ streamersList, setStreamersList, onClose, currentUser }
       }
       
       try {
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         const response = await fetch(
-          `http://localhost:5000/api/twitch/users?usernames=${missingProfiles.join(',')}`
+          `${apiUrl}/api/twitch/users?usernames=${missingProfiles.join(',')}`
         );
         
         if (response.ok) {
@@ -101,8 +102,9 @@ const StreamersList = ({ streamersList, setStreamersList, onClose, currentUser }
     setIsSearching(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         const response = await fetch(
-          `http://localhost:5000/api/twitch/search-users?query=${encodeURIComponent(newStreamer)}`
+          `${apiUrl}/api/twitch/search-users?query=${encodeURIComponent(newStreamer)}`
         );
         
         if (response.ok) {

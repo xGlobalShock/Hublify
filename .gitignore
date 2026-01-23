@@ -2,13 +2,13 @@
 /node_modules
 /.pnp
 .pnp.js
-Docs
 
 # testing
 /coverage
 
 # production
 /build
+/Docs
 
 # misc
 .DS_Store

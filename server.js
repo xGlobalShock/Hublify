@@ -227,10 +227,6 @@ function isValidUrl(string) {
   }
 }
 
-/**
- * Twitch User Search
- * GET /api/twitch/search-users
- */
 app.get('/api/twitch/search-users', async (req, res) => {
   const { query } = req.query;
 

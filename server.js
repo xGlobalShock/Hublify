@@ -105,11 +105,6 @@ app.post('/api/discord/callback', async (req, res) => {
   }
 });
 
-/**
- * Complete User Setup / Onboarding
- * POST /api/user/setup
- * Body: { name, gender, country, description, profileLinks }
- */
 app.post('/api/user/setup', (req, res) => {
   try {
     const { name, gender, country, description, profileLinks } = req.body;
@@ -163,9 +158,6 @@ app.post('/api/user/setup', (req, res) => {
         }
       }
     }
-
-    // In a real database, we would update the user with is_onboarded = true
-    // For now, we'll return success since we're using localStorage on the frontend
     
     res.json({
       success: true,
@@ -190,15 +182,9 @@ app.post('/api/user/setup', (req, res) => {
   }
 });
 
-/**
- * Reset User Profile / Onboarding
- * POST /api/user/reset
- * Resets the user's onboarding status so they can setup again
- */
+
 app.post('/api/user/reset', (req, res) => {
   try {
-    // In a real database, we would reset is_onboarded = false
-    // For now, we just confirm the reset
     res.json({
       success: true,
       message: 'Profile reset successfully. Please clear localStorage and refresh.',

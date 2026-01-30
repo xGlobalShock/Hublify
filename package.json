@@ -31,7 +31,8 @@
 		"dev": "node scripts/dev-quiet.js",
 		"build": "react-app-rewired build",
 		"test": "react-app-rewired test",
-		"eject": "react-scripts eject"
+		"eject": "react-scripts eject",
+		"ngrok": "start cmd /k \"ngrok http 3000\""
 	},
 	"proxy": "http://localhost:5000",
 	"eslintConfig": {

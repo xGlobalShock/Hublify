@@ -54,6 +54,7 @@
 	"devDependencies": {
 		"@types/three": "^0.182.0",
 		"autoprefixer": "^10.4.22",
+		"baseline-browser-mapping": "^2.9.19",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"jsrepo": "^3.0.5",
